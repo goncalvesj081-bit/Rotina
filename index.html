@@ -336,17 +336,7 @@ textarea{resize:vertical}
   <!-- ADICIONAR -->
   <div id="page-add" class="page">
     <div class="page-title">Adicionar tarefa</div>
-    <div class="page-desc">Descreva em linguagem natural ou preencha manualmente.</div>
-    <div class="add-card">
-      <div class="add-card-title">Linguagem natural</div>
-      <div class="natural-row">
-        <textarea class="natural-input" id="natural-input" rows="2" placeholder='Ex: "ligação com fornecedor às 14h toda quarta" ou "reunião dia 05/07 às 09h"'></textarea>
-        <button class="btn btn-primary" id="btn-add" onclick="processNatural()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>Adicionar</button>
-      </div>
-      <div class="chips" id="example-chips"></div>
-      <div class="ai-feedback" id="ai-feedback"></div>
-    </div>
-    <div class="divider-or">ou preencha manualmente</div>
+    <div class="page-desc">Preencha o formulário para adicionar uma tarefa à sua rotina.</div>
     <div class="add-card">
       <div class="add-card-title">Manual</div>
       <div class="manual-grid" style="margin-bottom:10px">
@@ -442,12 +432,18 @@ textarea{resize:vertical}
     <div class="sec-title" style="margin-bottom:8px">Agendado neste dia</div>
     <div id="day-event-list"></div>
     <div class="sec-title" style="margin-bottom:8px;margin-top:14px">Adicionar evento</div>
-    <div class="natural-row">
-      <textarea class="natural-input" id="day-input" rows="2" placeholder='Ex: "reunião às 10h"' style="font-size:13px"></textarea>
-      <button class="btn btn-primary" id="btn-day-add" onclick="processDayNatural()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg></button>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <input type="text" id="day-nome" placeholder="Nome do evento" style="flex:2;min-width:150px">
+      <input type="time" id="day-hora" style="flex:1;min-width:100px">
     </div>
-    <div class="ai-feedback" id="day-feedback"></div>
-    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-day')">Fechar</button></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select id="day-cor" style="flex:1"><option value="blue">Azul</option><option value="green">Verde</option><option value="amber">Âmbar</option><option value="red">Vermelho</option><option value="purple">Roxo</option></select>
+      <input type="text" id="day-obs" placeholder="Observação (opcional)" style="flex:2">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-day')">Fechar</button>
+      <button class="btn btn-primary" onclick="addDayEvent()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>Adicionar</button>
+    </div>
   </div>
 </div>
 <script>
@@ -899,33 +895,10 @@ function addManual(){
 }
 
 // ── IA ──
-function getSYS(){
-  const now=new Date();
-  const iso=now.toISOString().slice(0,10);
-  const dow=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'][now.getDay()];
-  return 'Você extrai uma tarefa de frases em português e retorna SOMENTE JSON válido, sem markdown. Campos: nome (string), hora (HH:MM ou ""), freq (daily|weekly|demand|once), dia (seg|ter|qua|qui|sex|""), data (YYYY-MM-DD ou ""), cor (blue|green|amber|red|purple|gray), obs (string ou ""). Regras: once=data específica, weekly=dia da semana sem data, daily=todo dia, demand=sob demanda. "de manhã"→09:00. "depois do almoço"→12:30. "final do dia"→17:00. "hoje"='+iso+' ('+dow+'). Ano ausente: use '+new Date().getFullYear()+'. Se freq=once e data="hoje", use data='+iso+'.';
-}
+function getSYS(){}
 
-async function callIA(text,extraSys){
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:getSYS()+(extraSys?'\n'+extraSys:''),messages:[{role:'user',content:text}]})});
-  const d=await r.json();
-  return JSON.parse(d.content.map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim());
-}
-function makeTask(p){return{id:'u'+Date.now(),nome:p.nome||'Tarefa',hora:p.hora||'',freq:['daily','weekly','demand','once'].includes(p.freq)?p.freq:'daily',dia:['seg','ter','qua','qui','sex'].includes(p.dia)?p.dia:'',data:p.data||'',cor:['blue','green','amber','red','purple','gray'].includes(p.cor)?p.cor:'blue',obs:p.obs||'',fixed:false};}
-
-async function processNatural(){
-  const text=document.getElementById('natural-input').value.trim();if(!text)return;
-  const btn=document.getElementById('btn-add'),fb=document.getElementById('ai-feedback');
-  btn.disabled=true;fb.className='ai-feedback';fb.innerHTML='<div class="spinner"></div> Interpretando...';
-  try{
-    const p=await callIA(text);if(!p.nome)throw new Error();
-    const t=makeTask(p);userTasks.push(t);save();sheetsPost('save_all_tarefas',{tarefas:userTasks});render();
-    const info=t.data?' em '+t.data.split('-').reverse().slice(0,2).join('/'):t.hora?' às '+t.hora:'';
-    fb.className='ai-feedback ok';fb.textContent='✓ "'+t.nome+'"'+info+' — '+{daily:'todo dia',weekly:'semanal',demand:'sob demanda',once:'evento único'}[t.freq];
-    document.getElementById('natural-input').value='';
-  }catch(e){fb.className='ai-feedback err';fb.textContent='✕ Erro: '+e.message;}
-  btn.disabled=false;
-}
+async function callIA(){}
+function makeTask(){}
 document.addEventListener('DOMContentLoaded',()=>{
   const ni=document.getElementById('natural-input');
   if(ni)ni.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();processNatural();}});
@@ -952,23 +925,18 @@ function renderDayEvents(iso){
   else if(!isV||isW)html+='<div class="empty" style="padding:8px 0;text-align:left;color:var(--text3);font-size:12px">Nenhum evento.</div>';
   document.getElementById('day-event-list').innerHTML=html;
 }
+function addDayEvent(){
+  const nome=document.getElementById('day-nome').value.trim();
+  if(!nome||!selectedDate){alert('Informe o nome do evento.');return;}
+  const t={id:'u'+Date.now(),nome,hora:document.getElementById('day-hora').value,freq:'once',dia:'',data:selectedDate,cor:document.getElementById('day-cor').value,obs:document.getElementById('day-obs').value.trim(),fixed:false};
+  userTasks.push(t);save();sheetsPost('save_all_tarefas',{tarefas:userTasks});render();renderDayEvents(selectedDate);
+  document.getElementById('day-nome').value='';document.getElementById('day-hora').value='';document.getElementById('day-obs').value='';
+}
 function removeDayTask(id,iso){
   userTasks=userTasks.filter(x=>x.id!==id);
   save();sheetsPost('save_all_tarefas',{tarefas:userTasks});renderDayEvents(iso);render();
 }
-async function processDayNatural(){
-  const text=document.getElementById('day-input').value.trim();if(!text||!selectedDate)return;
-  const btn=document.getElementById('btn-day-add'),fb=document.getElementById('day-feedback');
-  btn.disabled=true;fb.className='ai-feedback';fb.innerHTML='<div class="spinner"></div> Interpretando...';
-  try{
-    const p=await callIA(text,'Esta tarefa é para a data específica '+selectedDate+'. Force freq=once e data='+selectedDate+'.');
-    p.freq='once';p.data=selectedDate;if(!p.nome)throw new Error();
-    const t=makeTask(p);userTasks.push(t);save();sheetsPost('save_all_tarefas',{tarefas:userTasks});render();renderDayEvents(selectedDate);
-    fb.className='ai-feedback ok';fb.textContent='✓ "'+t.nome+'" adicionado';
-    document.getElementById('day-input').value='';
-  }catch(e){fb.className='ai-feedback err';fb.textContent='✕ Erro ao interpretar.';}
-  btn.disabled=false;
-}
+async function processDayNatural(){}
 document.addEventListener('DOMContentLoaded',()=>{
   const di=document.getElementById('day-input');
   if(di)di.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();processDayNatural();}});
@@ -1000,7 +968,7 @@ function searchGoTo(id){
 }
 
 // ── CHIPS ──
-function buildChips(){document.getElementById('example-chips').innerHTML=EXEMPLOS.map(e=>'<div class="chip" onclick="document.getElementById(\'natural-input\').value=\''+e+'\';document.getElementById(\'natural-input\').focus()">'+e+'</div>').join('');}
+function buildChips(){}
 
 // ── NAV ──
 function navTo(page,el){
