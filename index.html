@@ -899,10 +899,15 @@ function addManual(){
 }
 
 // ── IA ──
-const SYS='Você extrai uma tarefa de frases em português e retorna SOMENTE JSON válido, sem markdown. Campos: nome (string), hora (HH:MM ou ""), freq (daily|weekly|demand|once), dia (seg|ter|qua|qui|sex|""), data (YYYY-MM-DD ou ""), cor (blue|green|amber|red|purple|gray), obs (string ou ""). Regras: once=data específica, weekly=dia da semana, daily=todo dia, demand=sob demanda. "de manhã"→09:00. "depois do almoço"→12:30. "final do dia"→17:00. Ano ausente: use '+new Date().getFullYear()+'.';
+function getSYS(){
+  const now=new Date();
+  const iso=now.toISOString().slice(0,10);
+  const dow=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'][now.getDay()];
+  return 'Você extrai uma tarefa de frases em português e retorna SOMENTE JSON válido, sem markdown. Campos: nome (string), hora (HH:MM ou ""), freq (daily|weekly|demand|once), dia (seg|ter|qua|qui|sex|""), data (YYYY-MM-DD ou ""), cor (blue|green|amber|red|purple|gray), obs (string ou ""). Regras: once=data específica, weekly=dia da semana sem data, daily=todo dia, demand=sob demanda. "de manhã"→09:00. "depois do almoço"→12:30. "final do dia"→17:00. "hoje"='+iso+' ('+dow+'). Ano ausente: use '+new Date().getFullYear()+'. Se freq=once e data="hoje", use data='+iso+'.';
+}
 
 async function callIA(text,extraSys){
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:SYS+(extraSys?'\n'+extraSys:''),messages:[{role:'user',content:text}]})});
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:getSYS()+(extraSys?'\n'+extraSys:''),messages:[{role:'user',content:text}]})});
   const d=await r.json();
   return JSON.parse(d.content.map(c=>c.text||'').join('').trim().replace(/```json|```/g,'').trim());
 }
@@ -918,7 +923,7 @@ async function processNatural(){
     const info=t.data?' em '+t.data.split('-').reverse().slice(0,2).join('/'):t.hora?' às '+t.hora:'';
     fb.className='ai-feedback ok';fb.textContent='✓ "'+t.nome+'"'+info+' — '+{daily:'todo dia',weekly:'semanal',demand:'sob demanda',once:'evento único'}[t.freq];
     document.getElementById('natural-input').value='';
-  }catch(e){fb.className='ai-feedback err';fb.textContent='✕ Não consegui interpretar. Tente ser mais específico.';}
+  }catch(e){fb.className='ai-feedback err';fb.textContent='✕ Erro: '+e.message;}
   btn.disabled=false;
 }
 document.addEventListener('DOMContentLoaded',()=>{
