@@ -261,6 +261,29 @@ textarea{resize:vertical}
 
 /* ─── MODAL ──────────────────────────────────── */
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center}
+.nota-lista{display:flex;flex-direction:column;gap:4px;max-height:52vh;overflow-y:auto;margin-bottom:10px;padding-right:2px}
+.nota-item{display:flex;align-items:flex-start;gap:8px;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:9px 10px;transition:all .15s;cursor:default}
+.nota-item:hover{border-color:var(--bd3)}
+.nota-item.resolved{opacity:.65}
+.nota-item.resolved .nota-item-text{text-decoration:line-through;color:var(--tx2)}
+.nota-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--bd3);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;background:var(--s3);margin-top:1px}
+.nota-item.resolved .nota-check{background:var(--grn);border-color:var(--grn)}
+.nota-check svg{width:10px;height:10px;stroke:#fff;stroke-width:2.5;display:none}
+.nota-item.resolved .nota-check svg{display:block}
+.nota-item-text{flex:1;font-size:13px;color:var(--tx);line-height:1.5;outline:none;background:none;border:none;font-family:var(--sans);resize:none;padding:0;cursor:text;min-height:20px;word-break:break-word}
+.nota-item-text:focus{color:var(--tx)}
+.nota-item-del{background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;color:var(--tx3);opacity:0;transition:all .15s;display:flex;align-items:center;flex-shrink:0;margin-top:1px}
+.nota-item:hover .nota-item-del{opacity:1}
+.nota-item-del:hover{color:var(--red);background:var(--red-a)}
+.nota-item-del svg{width:11px;height:11px}
+.nota-add-row{display:flex;align-items:center;gap:8px;padding:6px 0}
+.nota-add-input{flex:1;background:transparent;border:none;border-bottom:1px solid var(--bd2);padding:6px 2px;font-size:13px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .15s}
+.nota-add-input:focus{border-bottom-color:var(--acc)}
+.nota-add-input::placeholder{color:var(--tx3)}
+.nota-add-btn{background:var(--acc);border:none;border-radius:var(--r);width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .1s}
+.nota-add-btn:hover{background:var(--acc2)}
+.nota-add-btn svg{width:13px;height:13px;stroke:#fff;stroke-width:2.5}
+.nota-empty{font-size:12px;color:var(--tx3);text-align:center;padding:16px 0;font-style:italic}
 .task-row.has-note .tr-bar{box-shadow:2px 0 8px rgba(79,142,247,.4)}
 .note-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:1px}
 .task-row:not(.is-fixed){cursor:pointer}
@@ -1771,112 +1794,137 @@ function testarSheets() {
 }
 
 // ═══════════════════════════════════════
-// ANOTAÇÕES POR TAREFA
+// ANOTAÇÕES POR TAREFA — lista de itens
 // ═══════════════════════════════════════
-// Estrutura: diarioData[iso].notas = { taskId: "texto" }
+// Estrutura: diarioData[iso].notas[taskId] = [{texto, resolved}]
 
-let _notaTaskId  = null;
-let _notaISO     = null;
-let _notaTimer   = null;
+let _notaTaskId   = null;
+let _notaISO      = null;
+let _notaItems    = [];
+let _notaReadOnly = false;
 
-function abrirNota(taskId, iso) {
-  const t = allTasks().find(x => String(x.id) === String(taskId));
-  if (!t) return;
-  _notaTaskId = String(taskId);
-  _notaISO    = iso;
-
-  // Preencher modal
-  const titulo = document.getElementById('nota-titulo');
-  const sub    = document.getElementById('nota-subtitulo');
-  const bar    = document.getElementById('nota-bar');
-  const texto  = document.getElementById('nota-texto');
-  const saved  = document.getElementById('nota-saved');
-
-  if (titulo) titulo.textContent = t.nome;
-  if (sub)    sub.textContent    = (t.hora || '—') + ' · ' + iso.split('-').reverse().join('/');
-  if (bar)    bar.style.background = ({blue:'var(--acc)',green:'var(--grn)',amber:'var(--amb)',red:'var(--red)',purple:'var(--pur)',gray:'var(--tx3)'})[t.cor] || 'var(--acc)';
-  if (saved)  saved.style.opacity = '0';
-
-  // Carregar anotação existente
-  const entry = diarioData[iso] || {};
-  const notas = entry.notas || {};
-  if (texto) {
-    texto.value    = notas[_notaTaskId] || '';
-    texto.readOnly = false;
-    texto.style.opacity = '1';
-    texto.placeholder = 'Anote observações, pendências, o que aconteceu nessa tarefa...';
-  }
-  const btns = document.getElementById('nota-btns');
-  if (btns) btns.style.display = 'flex';
-
-  document.getElementById('modal-nota').classList.add('open');
+function _notaBarColor(cor){
+  return ({blue:'var(--acc)',green:'var(--grn)',amber:'var(--amb)',red:'var(--red)',purple:'var(--pur)',gray:'var(--tx3)'})[cor]||'var(--acc)';
 }
 
-function verNota(taskId, iso) {
-  const t = allTasks().find(x => String(x.id) === String(taskId));
-  if (!t) return;
-
-  const titulo = document.getElementById('nota-titulo');
-  const sub    = document.getElementById('nota-subtitulo');
-  const bar    = document.getElementById('nota-bar');
-  const texto  = document.getElementById('nota-texto');
-  const saved  = document.getElementById('nota-saved');
-  const btns   = document.getElementById('nota-btns');
-
-  if (titulo) titulo.textContent = t.nome;
-  if (sub)    sub.textContent    = (t.hora||'—') + ' · ' + iso.split('-').reverse().join('/');
-  if (bar)    bar.style.background = ({blue:'var(--acc)',green:'var(--grn)',amber:'var(--amb)',red:'var(--red)',purple:'var(--pur)',gray:'var(--tx3)'})[t.cor]||'var(--acc)';
-  if (saved)  saved.style.opacity = '0';
-
-  const entry = diarioData[iso] || {};
-  const notas = entry.notas || {};
-  const nota  = notas[String(taskId)] || '';
-
-  if (texto) {
-    texto.value    = nota;
-    texto.readOnly = true;
-    texto.style.opacity = nota ? '1' : '0.5';
-    texto.placeholder = nota ? '' : 'Nenhuma anotação para esta tarefa.';
-  }
-
-  // Esconder botão salvar no modo leitura
-  if (btns) btns.style.display = 'none';
-
-  document.getElementById('modal-nota').classList.add('open');
+function _carregarItems(taskId, iso){
+  const entry = diarioData[iso]||{};
+  const notas = entry.notas||{};
+  const raw   = notas[String(taskId)];
+  if (!raw) return [];
+  if (typeof raw === 'string') return raw.split('\n').filter(l=>l.trim()).map(l=>({texto:l,resolved:false}));
+  if (Array.isArray(raw)) return raw.map(i=>typeof i==='string'?{texto:i,resolved:false}:{...i});
+  return [];
 }
 
-function salvarNota() {
-  if (!_notaTaskId || !_notaISO) return;
-  if (!diarioData[_notaISO]) diarioData[_notaISO] = {checks:{}, note:'', notas:{}};
-  if (!diarioData[_notaISO].notas) diarioData[_notaISO].notas = {};
-  diarioData[_notaISO].notas[_notaTaskId] = document.getElementById('nota-texto').value;
-  saveDiario();
-  sheetsPost('save_diario', {
-    data:   _notaISO,
-    checks: diarioData[_notaISO].checks || {},
-    note:   diarioData[_notaISO].note   || '',
-    notas:  diarioData[_notaISO].notas  || {},
+function _montarItems(){
+  const lista = document.getElementById('nota-lista');
+  if (!lista) return;
+  if (!_notaItems.length){
+    lista.innerHTML='<div class="nota-empty">Nenhuma anotação ainda.</div>';
+    return;
+  }
+  const sorted = [..._notaItems.map((it,i)=>({...it,_i:i}))].sort((a,b)=>a.resolved-b.resolved);
+  lista.innerHTML = sorted.map(it=>{
+    const del = _notaReadOnly?'':'<button class="nota-item-del" onclick="notaDelItem('+it._i+')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l10 10M12 2L2 12"/></svg></button>';
+    const chk = _notaReadOnly?'':' onclick="notaToggleItem('+it._i+')"';
+    return '<div class="nota-item'+(it.resolved?' resolved':'')+'"><div class="nota-check"'+chk+'><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></div><div class="nota-item-text" contenteditable="'+(_notaReadOnly?'false':'true')+'" data-idx="'+it._i+'" onblur="notaEditItem(this)">'+it.texto.replace(/</g,'&lt;')+'</div>'+del+'</div>';
+  }).join('');
+}
+
+function notaToggleItem(idx){
+  if (_notaItems[idx]===undefined) return;
+  _notaItems[idx].resolved=!_notaItems[idx].resolved;
+  _montarItems();
+}
+
+function notaDelItem(idx){
+  _notaItems.splice(idx,1);
+  _montarItems();
+}
+
+function notaEditItem(el){
+  const idx=parseInt(el.dataset.idx);
+  if (_notaItems[idx]!==undefined) _notaItems[idx].texto=el.innerText.trim();
+}
+
+function notaAddItem(){
+  const inp=document.getElementById('nota-add-input');
+  if (!inp) return;
+  const txt=inp.value.trim();
+  if (!txt) return;
+  _notaItems.unshift({texto:txt,resolved:false});
+  inp.value='';
+  _montarItems();
+  inp.focus();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const inp=document.getElementById('nota-add-input');
+  if (inp) inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();notaAddItem();}});
+});
+
+function _abrirModal(taskId, iso, readOnly){
+  const t=allTasks().find(x=>String(x.id)===String(taskId));
+  if (!t) return;
+  _notaTaskId=String(taskId);
+  _notaISO=iso;
+  _notaReadOnly=readOnly;
+  _notaItems=_carregarItems(taskId,iso);
+
+  const titulo=document.getElementById('nota-titulo');
+  const sub=document.getElementById('nota-subtitulo');
+  const bar=document.getElementById('nota-bar');
+  const saved=document.getElementById('nota-saved');
+  const addRow=document.getElementById('nota-add-row');
+  const btns=document.getElementById('nota-btns');
+
+  if (titulo) titulo.textContent=t.nome;
+  if (sub)    sub.textContent=(t.hora||'—')+' · '+iso.split('-').reverse().join('/');
+  if (bar)    bar.style.background=_notaBarColor(t.cor);
+  if (saved)  saved.style.opacity='0';
+  if (addRow) addRow.style.display=readOnly?'none':'flex';
+  if (btns)   btns.style.display=readOnly?'none':'flex';
+
+  _montarItems();
+  document.getElementById('modal-nota').classList.add('open');
+  if (!readOnly) setTimeout(()=>{const inp=document.getElementById('nota-add-input');if(inp)inp.focus();},100);
+}
+
+function abrirNota(taskId,iso){ _abrirModal(taskId,iso,false); }
+function verNota(taskId,iso)  { _abrirModal(taskId,iso,true);  }
+
+function salvarNota(){
+  if (!_notaTaskId||!_notaISO) return;
+  document.querySelectorAll('.nota-item-text').forEach(el=>{
+    const idx=parseInt(el.dataset.idx);
+    if (_notaItems[idx]!==undefined) _notaItems[idx].texto=el.innerText.trim();
   });
-  const saved = document.getElementById('nota-saved');
-  if (saved) { saved.style.opacity='1'; setTimeout(()=>saved.style.opacity='0',2000); }
-  // re-renderizar hoje para mostrar indicador de nota
+  if (!diarioData[_notaISO]) diarioData[_notaISO]={checks:{},note:'',notas:{}};
+  if (!diarioData[_notaISO].notas) diarioData[_notaISO].notas={};
+  diarioData[_notaISO].notas[_notaTaskId]=_notaItems;
+  saveDiario();
+  sheetsPost('save_diario',{
+    data:   _notaISO,
+    checks: diarioData[_notaISO].checks||{},
+    note:   diarioData[_notaISO].note||'',
+    notas:  diarioData[_notaISO].notas||{},
+  });
+  const saved=document.getElementById('nota-saved');
+  if (saved){saved.style.opacity='1';setTimeout(()=>saved.style.opacity='0',2000);}
   renderHoje();
 }
 
-// Auto-save ao digitar
-document.addEventListener('DOMContentLoaded', () => {
-  const ta = document.getElementById('nota-texto');
-  if (ta) ta.addEventListener('input', () => {
-    clearTimeout(_notaTimer);
-    _notaTimer = setTimeout(salvarNota, 1500);
-  });
-});
-
-function temNota(taskId, iso) {
-  const entry = diarioData[iso] || {};
-  const notas = entry.notas || {};
-  return !!(notas[String(taskId)] && notas[String(taskId)].trim());
+function temNota(taskId,iso){
+  const entry=diarioData[iso]||{};
+  const notas=entry.notas||{};
+  const raw=notas[String(taskId)];
+  if (!raw) return false;
+  if (typeof raw==='string') return raw.trim().length>0;
+  if (Array.isArray(raw)) return raw.length>0;
+  return false;
 }
+
 
 // ═══════════════════════════════════════
 // INIT
@@ -1901,18 +1949,21 @@ carregarDoSheets();
 </script>
 <!-- MODAL ANOTAÇÃO -->
 <div class="modal-backdrop" id="modal-nota">
-  <div class="modal" style="width:620px;max-height:90vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+  <div class="modal" style="width:580px;max-height:90vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
       <div class="tr-bar" id="nota-bar" style="width:3px;height:40px;border-radius:99px;flex-shrink:0"></div>
-      <div>
+      <div style="flex:1;min-width:0">
         <div class="modal-title" id="nota-titulo" style="margin-bottom:2px"></div>
         <div style="font-size:11px;color:var(--tx3);font-family:var(--mono)" id="nota-subtitulo"></div>
       </div>
+      <span id="nota-saved" style="font-size:11px;color:var(--grn);opacity:0;transition:opacity .3s;font-family:var(--mono);flex-shrink:0">✓ salvo</span>
     </div>
-    <div class="form-label" style="margin-bottom:8px">Anotações</div>
-    <textarea id="nota-texto" class="diario-textarea" style="min-height:240px;max-height:55vh;resize:vertical;line-height:1.85;font-size:13.5px;flex:1" placeholder="Anote observações, pendências, o que aconteceu nessa tarefa..."></textarea>
-    <div class="modal-actions">
-      <span id="nota-saved" style="font-size:11px;color:var(--grn);opacity:0;transition:opacity .3s;font-family:var(--mono);margin-right:auto">✓ salvo</span>
+    <div class="nota-lista" id="nota-lista"></div>
+    <div class="nota-add-row" id="nota-add-row">
+      <input class="nota-add-input" id="nota-add-input" placeholder="Nova anotação..." autocomplete="off">
+      <button class="nota-add-btn" onclick="notaAddItem()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 2v10M2 7h10"/></svg></button>
+    </div>
+    <div class="modal-actions" style="margin-top:14px">
       <button class="btn btn-ghost" onclick="closeModal('modal-nota')">Fechar</button>
       <div id="nota-btns" style="display:flex;gap:8px">
         <button class="btn btn-primary" onclick="salvarNota()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l3 3 7-7"/></svg>Salvar</button>
