@@ -290,7 +290,7 @@ textarea{resize:vertical}
   .main{padding:12px;width:100%;min-width:0;overflow-x:hidden}
 
   /* Sidebar — só logo + nav, sem seções extras */
-  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bd);width:100%}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bd);width:100%;padding-bottom:0}
   .sb-header{padding:10px 14px 8px}
   .sb-sub{display:none}
   .sb-section{padding:4px 10px;display:flex;flex-wrap:wrap;gap:4px}
@@ -362,12 +362,17 @@ textarea{resize:vertical}
   }
   #page-semana .day-col{min-width:150px;flex-shrink:0;scroll-snap-align:start}
 
-  /* Calendário */
-  .cal-grid{gap:2px}
-  .cal-day{min-height:46px;padding:3px}
-  .cal-pill{font-size:7px;padding:1px 3px}
-  .cal-day-num{font-size:9px}
-  .cal-weekday{font-size:7px}
+  /* Calendário mobile — scroll horizontal */
+  #page-mes{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .cal-nav{min-width:560px}
+  .cal-grid{gap:3px;min-width:560px}
+  .cal-day{height:auto;min-height:80px;padding:6px 5px;display:flex;flex-direction:column}
+  .cal-day-top{margin-bottom:4px}
+  .cal-day-num{font-size:12px;font-weight:600}
+  .cal-weekday{font-size:10px;letter-spacing:.04em;padding:5px 0;min-width:80px;text-align:center}
+  .cal-pills{gap:2px;overflow:hidden}
+  .cal-pill{font-size:10px;padding:2px 5px;line-height:1.4;border-radius:3px;white-space:nowrap}
+  .cal-more{font-size:9px;margin-top:2px}
 
   /* Formulário */
   .manual-grid{grid-template-columns:1fr;gap:8px}
