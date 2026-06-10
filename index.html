@@ -214,7 +214,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
 .check-item.done .check-box svg{display:block}
 .check-time{font-size:10px;font-family:var(--mono);color:var(--tx3);min-width:38px;flex-shrink:0;font-weight:500}
 .check-label{font-size:12px;color:var(--tx);flex:1}
-.diario-textarea{width:100%;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:14px;font-size:13px;font-family:var(--sans);color:var(--tx);outline:none;resize:vertical;min-height:130px;line-height:1.7;transition:border-color .15s,box-shadow .15s}
+.diario-textarea{width:100%;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:14px 16px;font-size:13px;font-family:var(--sans);color:var(--tx);outline:none;resize:vertical;min-height:130px;line-height:1.85;transition:border-color .15s,box-shadow .15s;letter-spacing:.01em}
 .diario-textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(79,142,247,.12)}
 .diario-save-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
 .diario-saved{font-size:11px;color:var(--grn);opacity:0;transition:opacity .3s;font-family:var(--mono)}
@@ -1901,7 +1901,7 @@ carregarDoSheets();
 </script>
 <!-- MODAL ANOTAÇÃO -->
 <div class="modal-backdrop" id="modal-nota">
-  <div class="modal" style="width:520px">
+  <div class="modal" style="width:620px;max-height:90vh;display:flex;flex-direction:column">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
       <div class="tr-bar" id="nota-bar" style="width:3px;height:40px;border-radius:99px;flex-shrink:0"></div>
       <div>
@@ -1910,7 +1910,7 @@ carregarDoSheets();
       </div>
     </div>
     <div class="form-label" style="margin-bottom:8px">Anotações</div>
-    <textarea id="nota-texto" class="diario-textarea" style="min-height:160px" placeholder="Anote observações, pendências, o que aconteceu nessa tarefa..."></textarea>
+    <textarea id="nota-texto" class="diario-textarea" style="min-height:240px;max-height:55vh;resize:vertical;line-height:1.85;font-size:13.5px;flex:1" placeholder="Anote observações, pendências, o que aconteceu nessa tarefa..."></textarea>
     <div class="modal-actions">
       <span id="nota-saved" style="font-size:11px;color:var(--grn);opacity:0;transition:opacity .3s;font-family:var(--mono);margin-right:auto">✓ salvo</span>
       <button class="btn btn-ghost" onclick="closeModal('modal-nota')">Fechar</button>
