@@ -261,13 +261,10 @@ textarea{resize:vertical}
 
 /* ─── MODAL ──────────────────────────────────── */
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center}
-<<<<<<< HEAD
 .task-row.has-note .tr-bar{box-shadow:2px 0 8px rgba(79,142,247,.4)}
 .note-dot{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0;margin-top:1px}
 .task-row:not(.is-fixed){cursor:pointer}
 .task-row:not(.is-fixed):hover .task-name{color:var(--acc)}
-=======
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
 .modal-backdrop.open{display:flex}
 .modal{background:var(--s1);border-radius:var(--rxl);border:1px solid var(--bd2);width:460px;max-width:95vw;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.7)}
 .modal-title{font-size:16px;font-weight:800;margin-bottom:18px;letter-spacing:-.02em}
@@ -591,7 +588,6 @@ textarea{resize:vertical}
 </div>
 
 <script>
-<<<<<<< HEAD
 // ═══════════════════════════════════════
 // CONSTANTES E ESTADO
 // ═══════════════════════════════════════
@@ -780,129 +776,10 @@ function renderHoje() {
   renderProgresso(todayISO, tasks);
   renderStreak('streak-wrap');
   renderAsideStats();
-=======
-// ═══════════════════════════════════════════
-// DADOS
-// ═══════════════════════════════════════════
-const SK='rotina_v4', SK_FIXED='rotina_fixed_v4', SK_DIARIO='rotina_diario_v1', SK_RESUMO='rotina_resumo_v1', SK_SHEETS='rotina_sheets_url';
-const MESES_PT=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-const MESES_FULL=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const DNAMES=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
-const DOWKEYS=['','seg','ter','qua','qui','sex',''];
-const WDAYS=[{k:'seg',l:'Segunda'},{k:'ter',l:'Terça'},{k:'qua',l:'Quarta'},{k:'qui',l:'Quinta'},{k:'sex',l:'Sexta'}];
-const EXEMPLOS=['ligação com fornecedor às 14h toda quarta','relatório semanal sexta às 17h','checar e-mails 09:00 todo dia','kick-off do projeto dia 10/07 às 09h','apresentação para diretoria 15/07 14h'];
-
-const FIXED_DEFAULT=[
-  {id:'f1',nome:'Reunião diária',hora:'08:00',freq:'daily',dia:'',cor:'blue',obs:'Duração variável — o dia começa depois',fixed:true},
-  {id:'f2',nome:'Almoço',hora:'11:00',freq:'daily',dia:'',cor:'gray',obs:'Pausa fixa até 12:30',fixed:true,isBreak:true},
-  {id:'f3',nome:'Passar pedidos pra processar',hora:'12:30',freq:'daily',dia:'',cor:'blue',obs:'Logo ao voltar do almoço',fixed:true},
-  {id:'f4',nome:'Conferir CNPs',hora:'08:30',freq:'weekly',dia:'seg',cor:'green',obs:'Após a reunião de segunda',fixed:true},
-  {id:'f5',nome:'Conferir pedidos recebidos',hora:'',freq:'demand',dia:'',cor:'amber',obs:'Sempre que um pedido chegar',fixed:true},
-  {id:'f6',nome:'Conferir cargas',hora:'',freq:'demand',dia:'',cor:'amber',obs:'Conforme forem solicitadas',fixed:true},
-];
-let FIXED=FIXED_DEFAULT.map(t=>({...t}));
-let userTasks=[], diarioData={};
-let calYear, calMonth, semanaBase=null, diarioDate=null, editId=null, fixedEditId=null, selectedDate=null;
-
-function ls(k,v){if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}
-function save(){ls(SK,JSON.stringify(userTasks));}
-function saveFixed(){
-  // Salva só as edições (diferenças em relação ao default)
-  const edits={};
-  FIXED.forEach(f=>{
-    const def=FIXED_DEFAULT.find(d=>d.id===f.id);
-    if(!def)return;
-    const e={};
-    ['nome','hora','freq','dia','cor','obs'].forEach(k=>{if(f[k]!==def[k])e[k]=f[k];});
-    if(Object.keys(e).length)edits[f.id]=e;
-  });
-  ls(SK_FIXED+'_edits',JSON.stringify(edits));
-}
-function saveDiario(){ls(SK_DIARIO,JSON.stringify(diarioData));}
-
-function load(){
-  try{userTasks=JSON.parse(ls(SK))||[];}catch(e){userTasks=[];}
-  try{
-    // Aplica apenas edições manuais salvas pelo usuário via Gerenciar
-    const edits=JSON.parse(ls(SK_FIXED+'_edits')||'{}');
-    Object.entries(edits).forEach(([id,e])=>{
-      const f=FIXED.find(x=>x.id===id);
-      if(f){
-        if(e.nome)f.nome=e.nome;
-        if(e.hora!==undefined)f.hora=e.hora;
-        if(e.freq)f.freq=e.freq;
-        if(e.dia!==undefined)f.dia=e.dia;
-        if(e.cor)f.cor=e.cor;
-        if(e.obs!==undefined)f.obs=e.obs;
-      }
-    });
-  }catch(e){}
-  try{diarioData=JSON.parse(ls(SK_DIARIO))||{};}catch(e){diarioData={};}
-}
-
-function all(){return[...FIXED,...userTasks];}
-function allTasks(){return all().filter(t=>!t.isBreak);}
-function toMin(t){if(!t)return 9999;const[h,m]=t.split(':').map(Number);return h*60+m;}
-function byTime(arr){return[...arr].sort((a,b)=>toMin(a.hora)-toMin(b.hora));}
-function isoToday(){return new Date().toISOString().slice(0,10);}
-function isViradaISO(iso,y){const vy=y||new Date().getFullYear();return iso>=(vy+'-06-29')&&iso<=(vy+'-07-03');}
-
-function dotClass(c){return({blue:'dot-blue',green:'dot-green',amber:'dot-amber',red:'dot-red',gray:'dot-gray',purple:'dot-blue'})[c]||'dot-blue';}
-function cpClass(c){return({blue:'cp-blue',green:'cp-green',amber:'cp-amber',red:'cp-red',purple:'cp-purple',gray:'cp-gray'})[c]||'cp-blue';}
-function dtClass(c){return({blue:'t-blue',green:'t-green',amber:'t-amber',purple:'t-purple'})[c]||'';}
-function tagHtml(t){
-  const m={daily:'<span class="tag tag-daily">todo dia</span>',weekly:'<span class="tag tag-weekly">semanal</span>',demand:'<span class="tag tag-demand">demanda</span>',once:'<span class="tag tag-once">evento</span>'};
-  let s=m[t.freq]||'';
-  if(t.dia)s+=' <span class="tag tag-fixed">'+t.dia+'</span>';
-  if(t.data){const[y,mo,d]=t.data.split('-');s+=' <span class="tag tag-once">'+d+'/'+mo+'</span>';}
-  return s;
-}
-
-// ── task rows ──
-function barClass(c){return({blue:'c-blue',green:'c-green',amber:'c-amber',red:'c-red',gray:'c-gray',purple:'c-purple'})[c]||'c-gray';}
-function taskRowHtml(t,actions=true){
-  const del=(!t.fixed&&actions)?'<button class="icon-btn" onclick="removeTask(\x27'+t.id+'\x27)" title="Remover"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.5h10M5 3.5V2h4v1.5M5.5 6v4M8.5 6v4M3 3.5l.7 8h6.6l.7-8"/></svg></button>':'';
-  const edit=(!t.fixed&&actions)?'<button class="icon-btn" onclick="openEdit(\x27'+t.id+'\x27)" title="Editar"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z"/></svg></button>':'';
-  const fixedBtns=t.fixed?'<button class="icon-btn" onclick="openFixedEdit(\x27'+t.id+'\x27)" title="Editar"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z"/></svg></button><button class="icon-btn" onclick="resetFixed(\x27'+t.id+'\x27)" title="Restaurar"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7a5 5 0 1 0 1-3M2 2v3h3"/></svg></button><button class="icon-btn" onclick="removeFixed(\x27'+t.id+'\x27)" title="Remover"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.5h10M5 3.5V2h4v1.5M5.5 6v4M8.5 6v4M3 3.5l.7 8h6.6l.7-8"/></svg></button>':'';
-  const acts=actions?'<div class="task-actions">'+(t.fixed?fixedBtns:edit+del)+'</div>':'';
-  return '<div class="task-row'+(t.fixed?' is-fixed':'')+'"><div class="tr-bar '+barClass(t.cor)+'"></div><div class="tr-inner"><div class="task-time">'+(t.hora||'—')+'</div><div class="task-body"><div class="task-name">'+t.nome+tagHtml(t)+'</div>'+(t.obs?'<div class="task-note">'+t.obs+'</div>':'')+'</div>'+acts+'</div></div>';
-}
-
-function taskRowHojeHtml(t,todayISO){
-  const entry=diarioData[todayISO]||{checks:{}};
-  const done=!!(entry.checks&&entry.checks[t.id]);
-  const badge=done?'<span class="done-badge">✓ concluída</span>':'';
-  return '<div class="task-row'+(t.fixed?' is-fixed':'')+(done?' is-done':'')+'"><div class="tr-bar '+barClass(t.cor)+'"></div><div class="tr-inner"><div class="task-time">'+(t.hora||'—')+'</div><div class="task-body"><div class="task-name">'+t.nome+tagHtml(t)+badge+'</div>'+(t.obs?'<div class="task-note">'+t.obs+'</div>':'')+'</div></div></div>';
-}
-
-// ── HOJE ──
-function renderHoje(){
-  const now=new Date();
-  const tlt=document.getElementById('today-label-title');
-const tl=document.getElementById('today-label');
-if(tlt)tlt.textContent=DNAMES[now.getDay()];
-if(tl)tl.textContent=now.getDate()+' de '+MESES_FULL[now.getMonth()]+' de '+now.getFullYear();
-  const todayKey=DOWKEYS[now.getDay()]||'';
-  const todayISO=isoToday();
-  const tasks=allTasks().filter(t=>t.freq==='daily'||(t.freq==='weekly'&&t.dia===todayKey)||(t.freq==='once'&&t.data===todayISO)||t.freq==='demand');
-  const manha=byTime(tasks.filter(t=>t.hora&&toMin(t.hora)<toMin('11:00')&&t.freq!=='demand'));
-  const tarde=byTime(tasks.filter(t=>t.hora&&toMin(t.hora)>=toMin('11:00')&&t.freq!=='demand'));
-  const demand=tasks.filter(t=>!t.hora||t.freq==='demand');
-  document.getElementById('tl-manha').innerHTML=manha.length?manha.map(t=>taskRowHojeHtml(t,todayISO)).join(''):'<div class="empty">Nenhuma tarefa de manhã.</div>';
-  document.getElementById('tl-tarde').innerHTML=tarde.length?tarde.map(t=>taskRowHojeHtml(t,todayISO)).join(''):'<div class="empty">Nenhuma tarefa de tarde.</div>';
-  document.getElementById('tl-demanda').innerHTML=demand.length?demand.map(t=>taskRowHojeHtml(t,todayISO)).join(''):'<div class="empty">Nenhuma.</div>';
-  const isV=isViradaISO(todayISO);
-  document.getElementById('virada-alert').style.display=isV?'flex':'none';
-  renderProgresso(todayISO,tasks);
-  renderStreak('streak-wrap');
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
   checarNotificacao();
   checarResumoSemanal();
-  renderAsideStats();
 }
 
-<<<<<<< HEAD
 function renderProgresso(todayISO, tasks) {
   try {
     const comHora = tasks.filter(t => t.hora && t.freq !== 'demand');
@@ -1381,406 +1258,11 @@ function searchGoTo(id) {
         r.scrollIntoView({behavior:'smooth',block:'center'});
         r.style.outline='2px solid var(--acc)';
         setTimeout(()=>r.style.outline='',1500);
-=======
-function renderProgresso(todayISO,tasks){
-  try{
-    const pbw=document.getElementById('prog-bar-wrap');
-    const comHora=tasks.filter(t=>t.hora&&t.freq!=='demand');
-    // atualizar barra do topo sempre
-    const pf=document.getElementById('prog-fill');
-    const entry=diarioData[todayISO]||{checks:{}};
-    const done=comHora.length?comHora.filter(t=>entry.checks&&entry.checks[t.id]).length:0;
-    const pct=comHora.length?Math.round(done/comHora.length*100):0;
-    if(pf) pf.style.width=pct+'%';
-    // barra inline (visível só se houver tarefas)
-    if(!pbw||!comHora.length){if(pbw)pbw.style.display='none';return;}
-    pbw.style.display='flex';
-    const pfm=document.getElementById('prog-fill-main');
-    if(pfm) pfm.style.width=pct+'%';
-    document.getElementById('prog-label').textContent=done+' de '+comHora.length+' feitas';
-    document.getElementById('prog-pct').textContent=pct+'%';
-    document.getElementById('prog-pct').style.color=pct===100?'var(--grn)':'var(--tx2)';
-  }catch(e){}
-}
-
-function renderStreak(id){
-  try{
-    const el=document.getElementById(id);if(!el)return;
-    const s=calcStreak();
-    if(!s){el.innerHTML='<span class="streak-zero">Nenhum registro ainda.</span>';return;}
-    el.innerHTML='<span class="streak-badge"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1c0 3-3 4-3 7a3 3 0 0 0 6 0c0-3-3-4-3-7z"/><path d="M5 10.5c.5.5 1.5.5 2 0"/></svg>'+s+(s===1?' dia seguido':' dias seguidos')+'</span>';
-  }catch(e){}
-}
-
-function calcStreak(){
-  let s=0;const d=new Date();d.setHours(0,0,0,0);
-  while(true){
-    const iso=d.toISOString().slice(0,10);
-    const e=diarioData[iso];
-    if(!e||(!(e.note&&e.note.trim())&&!Object.values(e.checks||{}).some(v=>v)))break;
-    s++;d.setDate(d.getDate()-1);
-  }
-  return s;
-}
-
-// ── NOTIFICAÇÕES ──
-function checarNotificacao(){
-  const el=document.getElementById('notif-banner');
-  if(el&&'Notification'in window&&Notification.permission==='default')el.style.display='flex';
-  else if(el)el.style.display='none';
-}
-function pedirNotificacao(){
-  Notification.requestPermission().then(p=>{
-    document.getElementById('notif-banner').style.display='none';
-    if(p==='granted')agendarNotificacoes();
-  });
-}
-let _notifTimers=[];
-function agendarNotificacoes(){
-  if(Notification.permission!=='granted')return;
-  _notifTimers.forEach(clearTimeout);_notifTimers=[];
-  const now=new Date(),iso=isoToday(),dk=DOWKEYS[now.getDay()]||'';
-  allTasks().filter(t=>t.hora&&(t.freq==='daily'||(t.freq==='weekly'&&t.dia===dk)||(t.freq==='once'&&t.data===iso))).forEach(t=>{
-    const[h,m]=t.hora.split(':').map(Number);
-    const tgt=new Date(now);tgt.setHours(h,m,0,0);
-    const ms=tgt-now-300000;
-    if(ms>0)_notifTimers.push(setTimeout(()=>new Notification('Rotina',{body:'Em 5 min: '+t.nome+' ('+t.hora+')',tag:t.id}),ms));
-  });
-}
-
-// ── RESUMO SEMANAL ──
-function getMondayOf(d){const x=new Date(d);const day=x.getDay()||7;x.setDate(x.getDate()-day+1);x.setHours(0,0,0,0);return x;}
-function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
-function getLastMonday(){return getMondayOf(addDays(getMondayOf(new Date()),-1));}
-function isoWeekNum(d){const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()+4-day);const y=new Date(Date.UTC(x.getUTCFullYear(),0,1));return{week:Math.ceil((((x-y)/86400000)+1)/7),year:x.getUTCFullYear()};}
-
-function checarResumoSemanal(){
-  try{
-    if(new Date().getDay()!==1)return;
-    const wrap=document.getElementById('resumo-semanal-wrap');if(!wrap)return;
-    const lm=getLastMonday();
-    const lmISO=lm.toISOString().slice(0,10);
-    if(ls('resumo_visto_'+lmISO))return;
-    let dias=0,feitas=0;
-    for(let i=0;i<5;i++){
-      const d=addDays(lm,i),iso=d.toISOString().slice(0,10),e=diarioData[iso];
-      if(e&&(e.note&&e.note.trim()||Object.values(e.checks||{}).some(v=>v)))dias++;
-      if(e&&e.checks)feitas+=Object.values(e.checks).filter(v=>v).length;
-    }
-    document.getElementById('rs-dias').textContent=dias;
-    document.getElementById('rs-feitas').textContent=feitas;
-    document.getElementById('rs-streak').textContent=calcStreak();
-    try{const r=JSON.parse(ls(SK_RESUMO)||'{}');document.getElementById('resumo-retro-text').value=r[lmISO]||'';}catch(e){}
-    wrap.style.display='block';
-  }catch(e){}
-}
-
-function fecharResumo(){
-  document.getElementById('resumo-semanal-wrap').style.display='none';
-  ls('resumo_visto_'+getLastMonday().toISOString().slice(0,10),'1');
-  sheetsPost('mark_resumo_visto',{semana_iso:getLastMonday().toISOString().slice(0,10)});
-}
-
-function salvarResumo(){
-  const iso=getLastMonday().toISOString().slice(0,10);
-  const texto=document.getElementById('resumo-retro-text').value;
-  try{const r=JSON.parse(ls(SK_RESUMO)||'{}');r[iso]=texto;ls(SK_RESUMO,JSON.stringify(r));}catch(e){}
-  sheetsPost('save_resumo',{semana_iso:iso,texto});
-  fecharResumo();
-}
-
-// ── DIÁRIO ──
-function diarioISO(d){return d.toISOString().slice(0,10);}
-function diarioHoje(){diarioDate=new Date();diarioDate.setHours(0,0,0,0);renderDiario();}
-function diarioPrev(){diarioDate=addDays(diarioDate,-1);renderDiario();}
-function diarioNext(){diarioDate=addDays(diarioDate,1);renderDiario();}
-
-function getDiarioTasks(d){
-  const dow=d.getDay(),dk=DOWKEYS[dow]||'',iso=diarioISO(d),isW=(dow===0||dow===6);
-  return byTime(allTasks().filter(t=>(t.freq==='daily'&&t.hora&&!isW)||(t.freq==='weekly'&&t.dia===dk&&t.hora)||(t.freq==='once'&&t.data===iso)));
-}
-
-function renderDiario(){
-  if(!diarioDate)diarioDate=new Date();
-  const iso=diarioISO(diarioDate);
-  document.getElementById('diario-date-label').textContent=DNAMES[diarioDate.getDay()]+', '+diarioDate.getDate()+' de '+MESES_FULL[diarioDate.getMonth()]+' de '+diarioDate.getFullYear();
-  const entry=diarioData[iso]||{checks:{},note:''};
-  const tasks=getDiarioTasks(diarioDate);
-  const checksEl=document.getElementById('diario-checks');
-  if(!tasks.length){checksEl.innerHTML='<div class="empty" style="padding:8px 0;text-align:left">Nenhuma tarefa para este dia.</div>';}
-  else checksEl.innerHTML=tasks.map(t=>{
-    const done=!!(entry.checks&&entry.checks[t.id]);
-    return '<div class="check-item'+(done?' done':'')+'" onclick="toggleCheck(\x27'+iso+'\x27,\x27'+t.id+'\x27)"><div class="check-box"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></div><span class="check-time">'+(t.hora||'—')+'</span><span class="check-label">'+t.nome+'</span></div>';
-  }).join('');
-  document.getElementById('diario-text').value=entry.note||'';
-  document.getElementById('diario-saved').classList.remove('show');
-  renderStreak('diario-streak-wrap');
-  // histórico
-  const hist=Object.entries(diarioData).filter(([d,e])=>d!==iso&&(e.note||(e.checks&&Object.values(e.checks).some(v=>v)))).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,5);
-  const hs=document.getElementById('diario-hist-section');
-  const he=document.getElementById('diario-hist');
-  if(!hist.length){hs.style.display='none';return;}
-  hs.style.display='block';
-  he.innerHTML=hist.map(([d,e])=>{
-    const dt=new Date(d+'T12:00:00');
-    const label=DNAMES[dt.getDay()]+', '+dt.getDate()+' de '+MESES_PT[dt.getMonth()];
-    const done=getDiarioTasks(dt).filter(t=>e.checks&&e.checks[t.id]);
-    const tags=done.map(t=>'<span class="diario-hist-tag">✓ '+t.nome+'</span>').join('');
-    return '<div class="diario-hist-item"><div class="diario-hist-date">'+label+'</div>'+(tags?'<div class="diario-hist-checks">'+tags+'</div>':'')+(e.note?'<div class="diario-hist-note">'+e.note+'</div>':'')+'</div>';
-  }).join('');
-}
-
-function toggleCheck(iso,taskId){
-  if(!diarioData[iso])diarioData[iso]={checks:{},note:''};
-  diarioData[iso].checks[taskId]=!diarioData[iso].checks[taskId];
-  saveDiario();
-  sheetsPost('save_diario_entry',{data:iso,checks:diarioData[iso].checks,note:diarioData[iso].note||''});
-  // sempre atualizar aba Hoje se for o dia de hoje
-  if(iso===isoToday()){
-    renderHoje(); // re-renderiza tarefas com badge atualizado
-  }
-  renderDiario(); // atualizar checks no diário
-  renderAsideStats(); // atualizar stats no topo
-}
-
-let _diarioTimer=null;
-function salvarDiario(){
-  const iso=diarioISO(diarioDate);
-  if(!diarioData[iso])diarioData[iso]={checks:{},note:''};
-  diarioData[iso].note=document.getElementById('diario-text').value;
-  saveDiario();
-  sheetsPost('save_diario_entry',{data:iso,checks:diarioData[iso].checks||{},note:diarioData[iso].note});
-  const el=document.getElementById('diario-saved');
-  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);
-  renderStreak('streak-wrap');
-  renderStreak('diario-streak-wrap');
-  if(iso===isoToday())renderHoje();
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  const ta=document.getElementById('diario-text');
-  if(ta)ta.addEventListener('input',()=>{clearTimeout(_diarioTimer);_diarioTimer=setTimeout(salvarDiario,1500);});
-});
-
-// ── SEMANA ──
-function semanaHoje(){semanaBase=getMondayOf(new Date());renderSemana();}
-function semanaPrev(){semanaBase=addDays(semanaBase,-7);renderSemana();}
-function semanaNext(){semanaBase=addDays(semanaBase,7);renderSemana();}
-
-function renderSemana(){
-  if(!semanaBase)semanaBase=getMondayOf(new Date());
-  const {week,year}=isoWeekNum(semanaBase);
-  const sun=addDays(semanaBase,6);
-  const fmt=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
-  document.getElementById('semana-label').textContent='Semana '+week+' de '+year+' · '+fmt(semanaBase)+' – '+fmt(sun);
-  const todayISO=isoToday();
-  const dias=[0,1,2,3,4].map(i=>addDays(semanaBase,i));
-  const temVirada=dias.some(d=>{const iso=d.toISOString().slice(0,10);return isViradaISO(iso,year);});
-  document.getElementById('semana-virada-alert').style.display=temVirada?'flex':'none';
-  document.getElementById('week-grid').innerHTML=dias.map((date,i)=>{
-    const iso=date.toISOString().slice(0,10);
-    const dk=WDAYS[i].k;
-    const isV=isViradaISO(iso,year);
-    const isToday=iso===todayISO;
-    const tasks=isV?byTime(allTasks().filter(t=>t.freq==='once'&&t.data===iso)):byTime(allTasks().filter(t=>(t.freq==='daily'&&t.hora)||(t.freq==='weekly'&&t.dia===dk&&t.hora)||(t.freq==='once'&&t.data===iso)));
-    const headStyle=isToday?' style="background:var(--blue-bg);color:var(--blue-text)"':'';
-    const dateStr=String(date.getDate()).padStart(2,'0')+' '+MESES_PT[date.getMonth()];
-    const viradaRow=isV?'<div class="day-task" style="background:var(--red-bg);border-color:#fca5a5;color:var(--red-text)"><strong>⚠ Virada de sistema</strong></div>':'';
-    const rows=tasks.map(t=>'<div class="day-task '+dtClass(t.cor)+'"><strong>'+(t.hora||'—')+' — '+t.nome+'</strong>'+(t.obs?'<br><span style="opacity:.8">'+t.obs+'</span>':'')+'</div>').join('');
-    return '<div class="day-col"><div class="day-head"'+headStyle+'><span>'+WDAYS[i].l+'</span><span style="font-weight:400;opacity:.7;margin-left:6px">'+dateStr+'</span>'+(isToday?'<span style="margin-left:auto;background:var(--blue);color:#fff;font-size:9px;padding:1px 6px;border-radius:99px;font-weight:600">hoje</span>':'')+'</div><div class="day-tasks">'+viradaRow+(rows||(!isV?'<div style="font-size:11px;color:var(--text3);padding:4px 2px">—</div>':''))+'</div></div>';
-  }).join('');
-}
-
-// ── MÊS ──
-function calToday(){const n=new Date();calYear=n.getFullYear();calMonth=n.getMonth();renderCal();}
-function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCal();}
-function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCal();}
-
-function renderCal(){
-  document.getElementById('cal-month-label').textContent=MONTHS[calMonth]+' '+calYear;
-  const first=new Date(calYear,calMonth,1).getDay();
-  const days=new Date(calYear,calMonth+1,0).getDate();
-  const offset=(first===0)?6:first-1;
-  const todayISO=isoToday();
-  const vs=calYear+'-06-29',ve=calYear+'-07-03';
-  let html=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d=>'<div class="cal-weekday">'+d+'</div>').join('');
-  for(let i=0;i<offset;i++)html+='<div class="cal-day is-empty"></div>';
-  for(let d=1;d<=days;d++){
-    const iso=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const dow=new Date(calYear,calMonth,d).getDay();
-    const isW=(dow===0||dow===6),dk=DOWKEYS[dow]||'';
-    const isV=iso>=vs&&iso<=ve,isToday=iso===todayISO;
-    const tasks=isV?byTime(allTasks().filter(t=>t.freq==='once'&&t.data===iso)):byTime(allTasks().filter(t=>(t.freq==='daily'&&t.hora&&!isW)||(t.freq==='weekly'&&t.dia===dk&&t.hora)||(t.freq==='once'&&t.data===iso)));
-    const numHtml=isToday?'<div class="cal-day-num"><span style="background:var(--blue);color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+d+'</span></div>':'<div class="cal-day-num">'+d+'</div>';
-    const dotHtml=isV?'<div class="cal-virada-dot"></div>':'';
-    const viradaPill=(isV&&!isW)?'<div class="cal-pill cp-red" style="font-weight:600">⚠ Virada</div>':'';
-    const pills=tasks.slice(0,isV?2:3).map(t=>'<div class="cal-pill '+cpClass(t.cor)+'">'+(t.hora?'<span style="opacity:.7;font-family:var(--mono)">'+t.hora+'</span> ':'')+t.nome+'</div>').join('');
-    const more=tasks.length>(isV?2:3)?'<div class="cal-more">+'+(tasks.length-(isV?2:3))+' mais</div>':'';
-    let cls='cal-day';if(isToday)cls+=' is-today';if(isV)cls+=' has-virada';
-    html+='<div class="'+cls+'" onclick="openDayModal(\x27'+iso+'\x27)"><div class="cal-day-top">'+numHtml+dotHtml+'</div><div class="cal-pills">'+viradaPill+pills+'</div>'+more+'</div>';
-  }
-  const rem=(7-(offset+days)%7)%7;
-  for(let i=0;i<rem;i++)html+='<div class="cal-day is-empty"></div>';
-  document.getElementById('cal-grid').innerHTML=html;
-}
-
-// ── GERENCIAR ──
-function renderTarefas(){
-  const fe=document.getElementById('tl-fixed');
-  if(fe)fe.innerHTML=byTime(FIXED).map(t=>taskRowHtml(t,true)).join('');
-  const re=byTime(userTasks.filter(t=>t.freq!=='once'));
-  const ev=[...userTasks.filter(t=>t.freq==='once')].sort((a,b)=>(a.data||'').localeCompare(b.data||''));
-  document.getElementById('tl-all').innerHTML=re.length?re.map(t=>taskRowHtml(t)).join(''):'<div class="empty">Nenhuma tarefa adicionada ainda.</div>';
-  document.getElementById('tl-events').innerHTML=ev.length?ev.map(t=>taskRowHtml(t)).join(''):'<div class="empty">Nenhum evento agendado.</div>';
-}
-
-// ── FIXED CRUD ──
-function openFixedEdit(id){
-  const t=FIXED.find(x=>x.id===id);if(!t)return;
-  fixedEditId=id;
-  document.getElementById('e-nome').value=t.nome;
-  document.getElementById('e-hora').value=t.hora||'';
-  document.getElementById('e-freq').value=t.freq;
-  document.getElementById('e-dia').value=t.dia||'';
-  document.getElementById('e-data').value='';
-  document.getElementById('e-cor').value=t.cor||'blue';
-  document.getElementById('e-obs').value=t.obs||'';
-  document.getElementById('modal-edit').dataset.mode='fixed';
-  document.getElementById('modal-edit').classList.add('open');
-}
-function resetFixed(id){
-  const def=FIXED_DEFAULT.find(x=>x.id===id),t=FIXED.find(x=>x.id===id);
-  if(!def||!t)return;
-  if(!confirm('Restaurar "'+def.nome+'" para o padrão original?'))return;
-  Object.assign(t,{...def,fixed:true});
-  saveFixed();sheetsPost('save_all_fixed',{fixed:FIXED});render();
-}
-function removeFixed(id){
-  const t=FIXED.find(x=>x.id===id);if(!t)return;
-  if(!confirm('Remover "'+t.nome+'" da rotina fixa?\nVocê pode restaurá-la depois pelo botão ↺.'))return;
-  FIXED.splice(FIXED.findIndex(x=>x.id===id),1);
-  saveFixed();sheetsPost('save_all_fixed',{fixed:FIXED});render();
-}
-
-// ── USER TASK CRUD ──
-function openEdit(id){
-  const t=userTasks.find(x=>x.id===id);if(!t)return;
-  editId=id;
-  document.getElementById('e-nome').value=t.nome;
-  document.getElementById('e-hora').value=t.hora||'';
-  document.getElementById('e-freq').value=t.freq;
-  document.getElementById('e-dia').value=t.dia||'';
-  document.getElementById('e-data').value=t.data||'';
-  document.getElementById('e-cor').value=t.cor||'blue';
-  document.getElementById('e-obs').value=t.obs||'';
-  document.getElementById('modal-edit').dataset.mode='user';
-  document.getElementById('modal-edit').classList.add('open');
-}
-function saveEdit(){
-  const isFixed=document.getElementById('modal-edit').dataset.mode==='fixed';
-  const arr=isFixed?FIXED:userTasks,id=isFixed?fixedEditId:editId;
-  const t=arr.find(x=>x.id===id);if(!t)return;
-  t.nome=document.getElementById('e-nome').value.trim();
-  t.hora=document.getElementById('e-hora').value;
-  t.freq=document.getElementById('e-freq').value;
-  t.dia=document.getElementById('e-dia').value;
-  if(!isFixed)t.data=document.getElementById('e-data').value;
-  t.cor=document.getElementById('e-cor').value;
-  t.obs=document.getElementById('e-obs').value.trim();
-  if(isFixed){saveFixed();sheetsPost('save_all_fixed',{fixed:FIXED});}
-  else{save();sheetsPost('save_all_tarefas',{tarefas:userTasks});}
-  render();closeModal('modal-edit');
-}
-function removeTask(id){
-  const t=userTasks.find(x=>x.id===id);if(!t)return;
-  if(!confirm('Remover "'+t.nome+'"?'))return;
-  userTasks=userTasks.filter(x=>x.id!==id);
-  save();sheetsPost('save_all_tarefas',{tarefas:userTasks});render();
-}
-function closeModal(id){document.getElementById(id).classList.remove('open');editId=null;fixedEditId=null;}
-document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-
-// ── ADD MANUAL ──
-function toggleManualFields(){
-  const v=document.getElementById('m-freq').value;
-  document.getElementById('m-field-dia').style.display=(v==='weekly')?'flex':'none';
-  document.getElementById('m-field-data').style.display=(v==='once')?'flex':'none';
-}
-function addManual(){
-  const nome=document.getElementById('m-nome').value.trim();
-  if(!nome){alert('Informe o nome da tarefa.');return;}
-  const freq=document.getElementById('m-freq').value;
-  const t={id:'u'+Date.now(),nome,hora:document.getElementById('m-hora').value,freq,dia:freq==='weekly'?document.getElementById('m-dia').value:'',data:freq==='once'?document.getElementById('m-data').value:'',cor:document.getElementById('m-cor').value,obs:document.getElementById('m-obs').value.trim(),fixed:false};
-  userTasks.push(t);save();sheetsPost('save_all_tarefas',{tarefas:userTasks});render();renderAsideEventos();renderMiniCal();
-  document.getElementById('m-nome').value='';document.getElementById('m-hora').value='';document.getElementById('m-obs').value='';document.getElementById('m-data').value='';
-  document.getElementById('ai-feedback').className='ai-feedback ok';document.getElementById('ai-feedback').textContent='✓ "'+t.nome+'" adicionada!';
-}
-
-// ── IA ──
-function getSYS(){}
-
-async function callIA(){}
-function makeTask(){}
-
-// ── MODAL DIA ──
-function openDayModal(iso){
-  selectedDate=iso;
-  const[y,m,d]=iso.split('-').map(Number);
-  document.getElementById('day-modal-title').textContent=DNAMES[new Date(y,m-1,d).getDay()]+', '+d+'/'+(m<10?'0'+m:m)+'/'+y;
-  renderDayEvents(iso);
-  document.getElementById('modal-day').classList.add('open');
-}
-function renderDayEvents(iso){
-  const[y,m,d]=iso.split('-').map(Number);
-  const dow=new Date(y,m-1,d).getDay(),dk=DOWKEYS[dow]||'';
-  const isV=isViradaISO(iso,y),isW=(dow===0||dow===6);
-  const tasks=byTime(allTasks().filter(t=>isV?(t.freq==='once'&&t.data===iso):((t.freq==='daily'&&!isW)||(t.freq==='weekly'&&t.dia===dk)||(t.freq==='once'&&t.data===iso))));
-  let html='';
-  if(isV&&!isW)html+='<div style="background:var(--red-bg);border:1px solid #fca5a5;border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:var(--red-text);margin-bottom:6px;line-height:1.5"><strong>Virada de sistema</strong><br>Rotina suspensa. Adicione eventos pontuais abaixo.</div>';
-  if(tasks.length)html+=tasks.map(t=>'<div class="day-event-item"><div class="task-dot '+dotClass(t.cor)+'" style="margin-top:0"></div><div class="task-time" style="min-width:46px">'+(t.hora||'—')+'</div><div style="flex:1">'+t.nome+'</div>'+(!t.fixed?'<button class="icon-btn" onclick="removeDayTask(\x27'+t.id+'\x27,\x27'+iso+'\x27)"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3.5h10M5 3.5V2h4v1.5M5.5 6v4M8.5 6v4M3 3.5l.7 8h6.6l.7-8"/></svg></button>':'')+'</div>').join('');
-  else if(!isV||isW)html+='<div class="empty" style="padding:8px 0;text-align:left;color:var(--text3);font-size:12px">Nenhum evento.</div>';
-  document.getElementById('day-event-list').innerHTML=html;
-}
-function addDayEvent(){
-  const nome=document.getElementById('day-nome').value.trim();
-  if(!nome||!selectedDate){alert('Informe o nome do evento.');return;}
-  const t={id:'u'+Date.now(),nome,hora:document.getElementById('day-hora').value,freq:'once',dia:'',data:selectedDate,cor:document.getElementById('day-cor').value,obs:document.getElementById('day-obs').value.trim(),fixed:false};
-  userTasks.push(t);save();sheetsPost('save_all_tarefas',{tarefas:userTasks});render();renderDayEvents(selectedDate);
-  document.getElementById('day-nome').value='';document.getElementById('day-hora').value='';document.getElementById('day-obs').value='';
-}
-function removeDayTask(id,iso){
-  userTasks=userTasks.filter(x=>x.id!==id);
-  save();sheetsPost('save_all_tarefas',{tarefas:userTasks});renderDayEvents(iso);render();
-}
-async function processDayNatural(){}
-
-// ── PESQUISA ──
-function onSearch(q){
-  const res=document.getElementById('search-results');
-  if(!q.trim()){res.classList.remove('open');return;}
-  const lower=q.toLowerCase();
-  const matches=all().filter(t=>t.nome.toLowerCase().includes(lower)||(t.obs&&t.obs.toLowerCase().includes(lower)));
-  const fl={daily:'todo dia',weekly:'semanal',demand:'demanda',once:'evento'};
-  res.innerHTML=matches.length?matches.slice(0,8).map(t=>'<div class="search-result-item" onclick="searchGoTo(\x27'+t.id+'\x27)"><div class="task-dot '+dotClass(t.cor)+'" style="margin-top:0;flex-shrink:0"></div><span style="flex:1;font-weight:500;font-size:13px">'+t.nome+'</span><span style="font-size:11px;color:var(--text3)">'+(t.hora||'')+' '+(fl[t.freq]||'')+' '+(t.dia||'')+'</span></div>').join(''):'<div class="search-result-item"><span style="color:var(--text3);font-size:13px">Nenhum resultado.</span></div>';
-  res.classList.add('open');
-}
-function closeSearch(){document.getElementById('search-results').classList.remove('open');document.getElementById('search-input').value='';}
-function searchGoTo(id){
-  closeSearch();
-  const btn=Array.from(document.querySelectorAll('.sb-item')).find(b=>b.textContent.trim()==='Gerenciar tarefas');
-  if(btn)navTo('gerenciar',btn);
-  setTimeout(()=>{
-    document.querySelectorAll('#tl-fixed .task-row,#tl-all .task-row,#tl-events .task-row').forEach(r=>{
-      if(r.innerHTML.includes("'"+id+"'")||r.innerHTML.includes('"'+id+'"')){
-        r.scrollIntoView({behavior:'smooth',block:'center'});
-        r.style.outline='2px solid var(--blue)';setTimeout(()=>r.style.outline='',1500);
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
       }
     });
   }, 150);
 }
 
-<<<<<<< HEAD
 function buildChips() {}
 
 // ═══════════════════════════════════════
@@ -1893,27 +1375,6 @@ function startClock() {
   tick();
   _clockTimer = setInterval(tick, 1000);
 }
-=======
-// ── CHIPS ──
-function buildChips(){}
-
-// ── NAV ──
-function navTo(page,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  if(el)el.classList.add('active');
-  if(page==='diario')renderDiario();
-  if(page==='config'){const u=ls(SK_SHEETS);const inp=document.getElementById('sheets-url-input');if(inp&&u)inp.value=u;}
-}
-
-function render(){
-  renderHoje();renderSemana();renderCal();renderTarefas();
-}
-
-// ── EXPORTAR ──
-function downloadFile(nome,conteudo,tipo){const b=new Blob([conteudo],{type:tipo});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=nome;a.click();URL.revokeObjectURL(u);}
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
 
 function renderAsideStats() {
   try {
@@ -2037,82 +1498,51 @@ function exportarDiarioTxt(){
   let txt='DIÁRIO DE ROTINA\n'+'='.repeat(40)+'\n\n';
   entries.forEach(([iso,e])=>{
     const dt=new Date(iso+'T12:00:00');
-<<<<<<< HEAD
     txt+=DNAMES[dt.getDay()]+', '+dt.getDate()+' de '+MESES_FULL[dt.getMonth()]+' de '+dt.getFullYear()+'\n'+'-'.repeat(30)+'\n';
     const done=getDiarioTasks(dt).filter(t=>e.checks&&e.checks[String(t.id)]);
     if(done.length){txt+='Tarefas:\n';done.forEach(t=>{txt+='  - '+(t.hora?t.hora+' - ':'')+t.nome+'\n';});txt+='\n';}
     if(e.note&&e.note.trim()) txt+='Registro:\n'+e.note.trim()+'\n';
-=======
-    txt+=DNAMES[dt.getDay()]+', '+dt.getDate()+' de '+MESES_FULL[dt.getMonth()]+' de '+dt.getFullYear()+'\n';
-    txt+='-'.repeat(30)+'\n';
-    const done=getDiarioTasks(dt).filter(t=>e.checks&&e.checks[t.id]);
-    if(done.length){txt+='Tarefas concluídas:\n';done.forEach(t=>{txt+='  - '+(t.hora?t.hora+' - ':'')+t.nome+'\n';});txt+='\n';}
-    if(e.note&&e.note.trim())txt+='Registro:\n'+e.note.trim()+'\n';
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
     txt+='\n';
   });
   downloadFile('diario_'+new Date().toISOString().slice(0,10)+'.txt',txt,'text/plain');
 }
+
 function exportarDiarioCsv(){
   const entries=Object.entries(diarioData).sort((a,b)=>a[0].localeCompare(b[0]));
   if(!entries.length){alert('Nenhum registro ainda.');return;}
   let csv='Data,Tarefas concluídas,Registro\n';
   entries.forEach(([iso,e])=>{
     const dt=new Date(iso+'T12:00:00');
-<<<<<<< HEAD
     const done=getDiarioTasks(dt).filter(t=>e.checks&&e.checks[String(t.id)]).map(t=>t.nome).join('; ');
     csv+=iso+',"'+done+'","'+(e.note||'').replace(/"/g,'""').replace(/\n/g,' ')+'"\n';
-=======
-    const done=getDiarioTasks(dt).filter(t=>e.checks&&e.checks[t.id]).map(t=>t.nome).join('; ');
-    const nota=(e.note||'').replace(/"/g,'""').replace(/\n/g,' ');
-    csv+=iso+',"'+done+'","'+nota+'"\n';
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
   });
   downloadFile('diario_'+new Date().toISOString().slice(0,10)+'.csv',csv,'text/csv');
 }
+
 function exportarJson(){
-<<<<<<< HEAD
   downloadFile('rotina_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({userTasks,diario:diarioData,resumos:JSON.parse(ls(SK_RESUMOS)||'{}')},null,2),'application/json');
-=======
-  const data={versao:'rotina_v4',exportado:new Date().toISOString(),userTasks,fixedOverrides:FIXED,diario:diarioData,resumos:JSON.parse(ls(SK_RESUMO)||'{}')};
-  downloadFile('rotina_backup_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json');
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
 }
+
 function importarJson(input){
-<<<<<<< HEAD
   const file=input.files[0]; if(!file)return;
   if(!confirm('Importar vai substituir os dados atuais. Continuar?')){input.value='';return;}
-=======
-  const file=input.files[0];if(!file)return;
-  if(!confirm('Importar vai substituir todos os dados atuais. Continuar?')){input.value='';return;}
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
   const r=new FileReader();
   r.onload=function(e){
     try{
       const d=JSON.parse(e.target.result);
-<<<<<<< HEAD
       if(d.userTasks){userTasks=d.userTasks;saveLocal();}
       if(d.diario){diarioData=d.diario;saveDiario();}
       if(d.resumos)ls(SK_RESUMOS,JSON.stringify(d.resumos));
       render(); alert('Importado com sucesso!');
     }catch(err){alert('Erro: '+err.message);}
-=======
-      if(!d.versao||!d.versao.startsWith('rotina'))throw new Error('Arquivo inválido');
-      if(d.userTasks){userTasks=d.userTasks;save();}
-      if(d.fixedOverrides){d.fixedOverrides.forEach(function(f){const t=FIXED.find(function(x){return x.id===f.id;});if(t)Object.assign(t,f,{fixed:true});});saveFixed();}
-      if(d.diario){diarioData=d.diario;saveDiario();}
-      if(d.resumos)ls(SK_RESUMO,JSON.stringify(d.resumos));
-      render();alert('Importado com sucesso!');
-    }catch(err){alert('Erro ao importar: '+err.message);}
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
     input.value='';
   };
   r.readAsText(file);
 }
+
 function apagarTudo(){
   if(!confirm('Apagar TODOS os dados? Irreversível.'))return;
   if(!confirm('Tem certeza?'))return;
-<<<<<<< HEAD
   [SK_TAREFAS,SK_DIARIO,SK_RESUMOS].forEach(k=>localStorage.removeItem(k));
   userTasks=[]; FIXED=FIXED_DEFAULT.map(t=>({...t})); diarioData={};
   render(); alert('Dados apagados.');
@@ -2359,342 +1789,6 @@ if (Notification.permission === 'granted') agendarNotificacoes();
 
 // Carregar Sheets após render local
 carregarDoSheets();
-=======
-  [SK,SK_FIXED,SK_DIARIO,SK_RESUMO].forEach(k=>localStorage.removeItem(k));
-  userTasks=[];FIXED=FIXED_DEFAULT.map(t=>({...t}));diarioData={};
-  render();alert('Dados apagados.');
-}
-
-// ═══════════════════════════════════════════
-// GOOGLE SHEETS
-// ═══════════════════════════════════════════
-function getSheetsUrl(){return ls(SK_SHEETS)||'';}
-
-async function sheetsPost(action,payload){
-  const url=getSheetsUrl();if(!url)return null;
-  try{const r=await fetch(url,{method:'POST',body:JSON.stringify({action,payload})});return await r.json();}
-  catch(e){return null;}
-}
-async function sheetsGet(){
-  const url=getSheetsUrl();if(!url)return null;
-  try{const r=await fetch(url);return await r.json();}catch(e){return null;}
-}
-
-function setStatus(msg,ok){
-  const el=document.getElementById('sheets-status');
-  if(!el)return;
-  el.style.color=ok===true?'var(--green)':ok===false?'var(--red)':'var(--text2)';
-  el.textContent=msg;
-}
-function setSyncStatus(msg){const el=document.getElementById('sync-status');if(el)el.textContent=msg;}
-
-function salvarSheetsUrl(){
-  const url=document.getElementById('sheets-url-input').value.trim();
-  if(!url){alert('Cole a URL do Apps Script.');return;}
-  ls(SK_SHEETS,url);
-  testarSheets();
-}
-
-async function testarSheets(){
-  const url=getSheetsUrl();
-  if(!url){setStatus('URL não configurada.',false);return;}
-  setStatus('Testando...',null);
-  try{
-    const r=await fetch(url+'?action=ping');
-    const d=await r.json();
-    if(d.ok){setStatus('✓ Conectado!',true);}
-    else throw new Error(d.error);
-  }catch(e){setStatus('✕ Erro: '+e.message,false);}
-}
-
-async function carregarDoSheets(){
-  const url=getSheetsUrl();
-  if(!url){alert('Configure a URL do Sheets primeiro em Configurações.');return;}
-  setStatus('Carregando...',null);setSyncStatus('Carregando...');
-  try{
-    const d=await sheetsGet();
-    if(!d||!d.ok)throw new Error(d&&d.error?d.error:'Erro desconhecido');
-    if(d.tarefas){userTasks=d.tarefas.filter(t=>!t.fixed);save();}
-    // fixedOverrides vem do Sheets mas FIXED sempre parte do código — não sobrescrever
-    if(d.diario){diarioData=d.diario;saveDiario();}
-    if(d.resumos)ls(SK_RESUMO,JSON.stringify(d.resumos));
-    render();
-    setStatus('✓ Dados carregados!',true);setSyncStatus('Sincronizado ✓');
-  }catch(e){setStatus('✕ '+e.message,false);setSyncStatus('Erro ao sincronizar');}
-}
-
-async function sincronizarParaSheets(){
-  const url=getSheetsUrl();
-  if(!url){alert('Configure a URL do Sheets primeiro em Configurações.');return;}
-  setStatus('Sincronizando...',null);setSyncStatus('Sincronizando...');
-  try{
-    await sheetsPost('save_all_tarefas',{tarefas:userTasks});
-    await sheetsPost('save_all_fixed',{fixed:FIXED});
-    for(const[data,entry]of Object.entries(diarioData)){
-      await sheetsPost('save_diario_entry',{data,checks:entry.checks||{},note:entry.note||''});
-    }
-    const resumos=JSON.parse(ls(SK_RESUMO)||'{}');
-    for(const[semana,texto]of Object.entries(resumos)){
-      await sheetsPost('save_resumo',{semana_iso:semana,texto});
-    }
-    setStatus('✓ Sincronizado!',true);setSyncStatus('Sincronizado ✓');
-  }catch(e){setStatus('✕ '+e.message,false);setSyncStatus('Erro ao sincronizar');}
-}
-
-
-
-// ── PRÓXIMA TAREFA ──────────────────────────────────────────────────────
-function renderNextTask(){
-  try {
-    const el = document.getElementById('aside-next');
-    const pg = document.getElementById('next-prog');
-    if(!el) return;
-
-    const now = new Date();
-    const todayISO = isoToday();
-    const dk = DOWKEYS[now.getDay()]||'';
-    const nowMin = now.getHours()*60 + now.getMinutes();
-
-    // tarefas de hoje com horário fixo
-    const tasks = byTime(allTasks().filter(t =>
-      t.hora && (
-        t.freq==='daily' ||
-        (t.freq==='weekly' && t.dia===dk) ||
-        (t.freq==='once' && t.data===todayISO)
-      )
-    ));
-
-    if(!tasks.length){
-      el.innerHTML = '<div class="next-empty">Sem tarefas hoje</div>';
-      if(pg) pg.style.width='0%';
-      return;
-    }
-
-    const toM = h => { const[hh,mm]=h.split(':').map(Number); return hh*60+mm; };
-
-    // tarefa em andamento = última tarefa cujo horário já passou
-    const happening = [...tasks].reverse().find(t => toM(t.hora) <= nowMin);
-    // próxima = primeira tarefa que ainda não chegou
-    const next = tasks.find(t => toM(t.hora) > nowMin);
-
-    const target = next || null;
-
-    if(!target && !happening){
-      el.innerHTML = '<div class="next-empty">Nenhuma tarefa pendente</div>';
-      if(pg) pg.style.width='100%';
-      return;
-    }
-
-    if(!target){
-      // todas concluídas
-      el.innerHTML = '<div class="next-empty">Todas as tarefas do dia passaram</div>';
-      if(pg) pg.style.width='100%';
-      return;
-    }
-
-    const diffMin = toM(target.hora) - nowMin;
-    let badge = '';
-    if(diffMin <= 0){
-      badge = '<div class="next-badge">Agora</div>';
-    } else if(diffMin <= 30){
-      badge = '<div class="next-badge soon">Em '+diffMin+'min</div>';
-    } else {
-      const h = Math.floor(diffMin/60);
-      const m = diffMin%60;
-      const str = h>0 ? 'Em '+h+'h'+(m>0?m+'min':'') : 'Em '+m+'min';
-      badge = '<div class="next-badge soon">'+str+'</div>';
-    }
-
-    el.innerHTML = badge
-      + '<div class="next-name">'+target.nome+'</div>'
-      + '<div class="next-time">'+target.hora+(target.obs?' · '+target.obs:'')+'</div>';
-
-    // barra de progresso do dia (% das tarefas que já passaram)
-    if(pg){
-      const passed = tasks.filter(t => toM(t.hora) <= nowMin).length;
-      const pct = Math.round((passed / tasks.length) * 100);
-      pg.style.width = pct + '%';
-    }
-  } catch(e){ console.warn('renderNextTask:', e); }
-}
-
-// ── TEMPO DE EXPEDIENTE ──────────────────────────────────────────────────
-function renderExpediente(){
-  try {
-    const el = document.getElementById('aside-exp');
-    if(!el) return;
-
-    const now = new Date();
-    const dow = now.getDay();
-
-    // fora dos dias úteis
-    if(dow === 0 || dow === 6){
-      el.innerHTML = '<div class="exp-off">Fim de semana 🎉</div>';
-      return;
-    }
-
-    const nowMin = now.getHours()*60 + now.getMinutes();
-    const inicioMin = 8*60;    // 08:00
-    const fimMin = 17*60+30;   // 17:30
-    const totalMin = fimMin - inicioMin; // 570 min
-
-    if(nowMin < inicioMin){
-      const diff = inicioMin - nowMin;
-      const h = Math.floor(diff/60), m = diff%60;
-      el.innerHTML = '<div class="exp-sublabel">Expediente começa em</div>'
-        + '<div class="exp-countdown">'+(h>0?h+'h':'')+String(m).padStart(2,'0')+'m</div>'
-        + '<div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:0%;background:var(--acc)"></div></div>';
-      return;
-    }
-
-    if(nowMin >= fimMin){
-      el.innerHTML = '<div class="exp-done">Expediente encerrado ✓</div>'
-        + '<div class="progress-bar" style="margin-top:8px"><div class="progress-fill" style="width:100%;background:var(--grn)"></div></div>';
-      return;
-    }
-
-    // durante o expediente
-    const passedMin = nowMin - inicioMin;
-    const restMin = fimMin - nowMin;
-    const pct = Math.round((passedMin / totalMin) * 100);
-
-    const rh = Math.floor(restMin/60);
-    const rm = restMin%60;
-    const restStr = (rh>0 ? rh+'h' : '') + String(rm).padStart(2,'0')+'m';
-
-    // cor muda conforme perto do fim
-    const barColor = pct > 85
-      ? 'linear-gradient(90deg,var(--amb),var(--red))'
-      : 'linear-gradient(90deg,var(--acc),var(--grn))';
-
-    el.innerHTML = '<div class="exp-sublabel">Falta para 17:30</div>'
-      + '<div class="exp-countdown">'+restStr+'</div>'
-      + '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div>';
-  } catch(e){ console.warn('renderExpediente:', e); }
-}
-
-// ── ASIDE PANEL ──────────────────────────────────────────
-let _miniCalY, _miniCalM;
-let _clockTimer = null;
-
-function startClock(){
-  if(_clockTimer) return;
-  function tick(){
-    const n = new Date();
-    const h = String(n.getHours()).padStart(2,'0');
-    const m = String(n.getMinutes()).padStart(2,'0');
-    const s = String(n.getSeconds()).padStart(2,'0');
-    const eH = document.getElementById('cl-hm');
-    const eS = document.getElementById('cl-s');
-    const eD = document.getElementById('cl-d');
-    if(eH) eH.textContent = h+':'+m;
-    if(eS) eS.textContent = ':'+s;
-    if(eD) eD.textContent = DNAMES[n.getDay()]+', '+n.getDate()+' de '+MESES_FULL[n.getMonth()]+' de '+n.getFullYear();
-    renderNextTask();
-    renderExpediente();
-  }
-  tick();
-  _clockTimer = setInterval(tick, 1000);
-}
-
-function renderAsideStats(){
-  try {
-    const now = new Date();
-    const todayISO = isoToday();
-    const dk = DOWKEYS[now.getDay()]||'';
-    const tasks = allTasks().filter(t=>
-      t.hora && (t.freq==='daily'||(t.freq==='weekly'&&t.dia===dk)||(t.freq==='once'&&t.data===todayISO))
-    );
-    const entry = diarioData[todayISO]||{checks:{}};
-    const feitas = tasks.filter(t=>entry.checks&&entry.checks[t.id]).length;
-    const sT = document.getElementById('st-total');
-    const sF = document.getElementById('st-feitas');
-    const sS = document.getElementById('st-streak');
-    if(sT) sT.textContent = tasks.length;
-    if(sF) sF.textContent = feitas;
-    if(sS) sS.textContent = calcStreak();
-  } catch(e){}
-}
-
-function renderMiniCal(){
-  try {
-    const y = _miniCalY, m = _miniCalM;
-    const lbl = document.getElementById('mc-label');
-    if(lbl) lbl.textContent = MONTHS[m].slice(0,3).toUpperCase()+' '+y;
-    const first = new Date(y,m,1).getDay();
-    const days = new Date(y,m+1,0).getDate();
-    const offset = (first===0)?6:first-1;
-    const todayISO = isoToday();
-    const vs = y+'-06-29', ve = y+'-07-03';
-    let html = ['S','T','Q','Q','S','S','D'].map(d=>'<div class="mc-wd">'+d+'</div>').join('');
-    for(let i=0;i<offset;i++) html+='<div class="mc-day empty"></div>';
-    for(let d=1;d<=days;d++){
-      const iso = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-      const dow = new Date(y,m,d).getDay();
-      const isT = iso===todayISO;
-      const isV = iso>=vs&&iso<=ve;
-      const hasEv = userTasks.some(t=>t.freq==='once'&&t.data===iso);
-      let cls='mc-day';
-      if(isT) cls+=' today';
-      else if(isV) cls+=' virada';
-      if(hasEv) cls+=' has-ev';
-      html+='<div class="'+cls+'" onclick="openDayModal(\x27'+iso+'\x27)">'+d+'</div>';
-    }
-    const rem=(7-(offset+days)%7)%7;
-    for(let i=0;i<rem;i++) html+='<div class="mc-day empty"></div>';
-    const el = document.getElementById('mc-grid');
-    if(el) el.innerHTML = html;
-  } catch(e){}
-}
-
-function miniCalPrev(){ _miniCalM--; if(_miniCalM<0){_miniCalM=11;_miniCalY--;} renderMiniCal(); }
-function miniCalNext(){ _miniCalM++; if(_miniCalM>11){_miniCalM=0;_miniCalY++;} renderMiniCal(); }
-
-function renderAsideEventos(){
-  try {
-    const todayISO = isoToday();
-    const ev = userTasks
-      .filter(t=>t.freq==='once'&&t.data&&t.data>=todayISO)
-      .sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora))
-      .slice(0,5);
-    const el = document.getElementById('aside-ev');
-    if(!el) return;
-    if(!ev.length){ el.innerHTML='<div class="aside-ev-empty">Nenhum evento próximo</div>'; return; }
-    el.innerHTML = ev.map(t=>{
-      const [yr,mo,dy] = t.data.split('-').map(Number);
-      const isToday = t.data===todayISO;
-      const dStr = isToday?'Hoje':dy+' '+MESES_PT[mo-1];
-      const barColors = {blue:'var(--c-acc)',green:'var(--c-grn)',amber:'var(--c-amb)',red:'var(--c-red)',purple:'var(--c-pur)',gray:'var(--c-tx3)'};
-      const bc = barColors[t.cor]||'var(--c-acc)';
-      return '<div class="aside-ev-item"><div class="aside-ev-bar" style="background:'+bc+'"></div><div class="aside-ev-body"><div class="aside-ev-nome">'+t.nome+'</div><div class="aside-ev-data">'+dStr+(t.hora?' · '+t.hora:'')+'</div></div></div>';
-    }).join('');
-  } catch(e){}
-}
-
-function renderAside(){
-  renderAsideStats();
-  renderMiniCal();
-  renderAsideEventos();
-}
-
-// ── INIT ──
-const now=new Date();
-calYear=now.getFullYear();calMonth=now.getMonth();
-semanaBase=getMondayOf(now);
-diarioDate=new Date();diarioDate.setHours(0,0,0,0);
-load();buildChips();toggleManualFields();render();
-const _n=new Date();_miniCalY=_n.getFullYear();_miniCalM=_n.getMonth();
-startClock();renderAside();
-if(Notification.permission==='granted')agendarNotificacoes();
-// Carregar do Sheets se configurado — após render inicial
-const _sheetsUrl=getSheetsUrl();
-if(_sheetsUrl){
-  const _inp=document.getElementById('sheets-url-input');
-  if(_inp)_inp.value=_sheetsUrl;
-  // pequeno delay pra não bloquear o render inicial
-  setTimeout(carregarDoSheets, 300);
-}
->>>>>>> 0b04fb1e45bff200b71b0121ca8c1deb31e37404
 </script>
 <!-- MODAL ANOTAÇÃO -->
 <div class="modal-backdrop" id="modal-nota">
