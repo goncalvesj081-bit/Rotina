@@ -87,6 +87,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100
 
 /* ─── TAGS ───────────────────────────────────── */
 .tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle;text-transform:uppercase;letter-spacing:.07em}
+.tipo-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.tipo-reuniao{background:var(--acc-a);color:var(--acc)}
+.tipo-entrega{background:var(--amb-a);color:var(--amb)}
+.tipo-ligacao{background:var(--grn-a);color:var(--grn)}
+.tipo-revisao{background:var(--pur-a);color:var(--pur)}
+.tipo-tarefa{background:rgba(255,255,255,.05);color:var(--tx3)}
 .tag-daily{background:var(--acc-a);color:var(--acc)}.tag-weekly{background:var(--grn-a);color:var(--grn)}.tag-demand{background:var(--amb-a);color:var(--amb)}.tag-once{background:var(--pur-a);color:var(--pur)}.tag-fixed{background:rgba(255,255,255,.04);color:var(--tx3)}
 .done-badge{font-size:9px;font-weight:700;color:var(--grn);background:var(--grn-a);border:1px solid var(--grn-b);border-radius:4px;padding:2px 7px;margin-left:6px;vertical-align:middle;text-transform:uppercase;letter-spacing:.06em}
 .empty{text-align:center;padding:24px;font-size:12px;color:var(--tx3);font-style:italic}
@@ -252,6 +258,89 @@ select option{background:var(--s2)}
 textarea{resize:vertical}
 ::placeholder{color:var(--tx3)}
 
+/* ─── BORDO ─────────────────────────────────── */
+.bordo-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+.bordo-main{min-width:0}
+.bordo-side{display:flex;flex-direction:column;gap:12px;position:sticky;top:24px}
+.bordo-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px}
+.bordo-card-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--tx3);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.bordo-saved{font-size:11px;color:var(--grn);opacity:0;transition:opacity .3s;font-family:var(--mono)}
+.bordo-saved.show{opacity:1}
+.sticky{background:#141f11;border:1px solid rgba(34,211,138,.2);border-radius:var(--rl);padding:16px}
+.sticky-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;color:var(--grn);margin-bottom:10px}
+.sticky-textarea{width:100%;background:transparent;border:none;outline:none;font-size:13px;font-family:var(--sans);color:var(--tx);resize:none;min-height:90px;line-height:1.7;padding:0}
+.sticky-textarea::placeholder{color:rgba(34,211,138,.25)}
+.pend-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:4px;transition:all .15s}
+.pend-item:hover{border-color:var(--bd2)}
+.pend-item.done{opacity:.55}
+.pend-item.done .pend-text{text-decoration:line-through;color:var(--tx3)}
+.pend-chk{width:15px;height:15px;border-radius:3px;border:1.5px solid var(--bd3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;background:var(--s3)}
+.pend-item.done .pend-chk{background:var(--grn);border-color:var(--grn)}
+.pend-chk svg{width:9px;height:9px;stroke:#fff;stroke-width:2.5;display:none}
+.pend-item.done .pend-chk svg{display:block}
+.pend-text{flex:1;font-size:12px;color:var(--tx);line-height:1.5;outline:none;background:none;border:none;font-family:var(--sans);padding:0;cursor:text;word-break:break-word}
+.pend-del{background:none;border:none;cursor:pointer;padding:2px;border-radius:3px;color:var(--tx3);opacity:0;transition:all .1s;flex-shrink:0}
+.pend-item:hover .pend-del{opacity:1}
+.pend-del:hover{color:var(--red)}
+.pend-add{display:flex;gap:6px;align-items:center;margin-top:8px}
+.pend-add input{flex:1;background:transparent;border:none;border-bottom:1px solid var(--bd2);padding:5px 2px;font-size:12px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .15s}
+.pend-add input:focus{border-bottom-color:var(--acc)}
+.pend-add input::placeholder{color:var(--tx3)}
+.pend-add-btn{background:var(--acc);border:none;border-radius:5px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.pend-add-btn:hover{background:var(--acc2)}
+.pend-add-btn svg{width:11px;height:11px;stroke:#fff;stroke-width:2.5}
+.tl-bordo{display:flex;flex-direction:column;gap:0;position:relative;padding-left:20px}
+.tl-bordo::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:1px;background:var(--bd2)}
+.tl-ev{position:relative;padding:0 0 14px 14px}
+.tl-ev::before{content:'';position:absolute;left:-7px;top:4px;width:7px;height:7px;border-radius:50%;background:var(--bd2);border:2px solid var(--s1);z-index:1}
+.tl-ev.c-check::before{background:var(--grn)}
+.tl-ev.c-nota::before{background:var(--acc)}
+.tl-ev.c-pend::before{background:var(--pur)}
+.tl-ev.c-diario::before{background:var(--amb)}
+.tl-ev-hora{font-size:10px;font-family:var(--mono);color:var(--tx3);margin-bottom:1px}
+.tl-ev-desc{font-size:12px;color:var(--tx2);line-height:1.4}
+.tl-ev-desc strong{color:var(--tx);font-weight:500}
+.term-row{display:flex;gap:6px;margin-bottom:12px}
+.term-op{flex:1;padding:10px 6px;border-radius:var(--r);border:2px solid var(--bd);background:var(--s2);cursor:pointer;text-align:center;font-size:22px;transition:all .15s}
+.term-op:hover{border-color:var(--bd3)}
+.term-op.sel{border-color:var(--acc);background:var(--acc-b)}
+.term-op-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);margin-top:4px}
+@media(max-width:700px){.bordo-grid{grid-template-columns:1fr}.bordo-side{position:static}}
+/* ─── REUNIÕES ───────────────────────────────── */
+.reuniao-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:18px 20px;margin-bottom:10px;transition:border-color .15s;cursor:pointer}
+.reuniao-card:hover{border-color:var(--bd2)}
+.reuniao-card-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.reuniao-card-date{font-size:10px;font-family:var(--mono);color:var(--tx3);flex-shrink:0}
+.reuniao-card-title{font-size:14px;font-weight:600;color:var(--tx);flex:1}
+.reuniao-card-count{font-size:10px;font-weight:700;background:var(--acc-a);color:var(--acc);border-radius:99px;padding:2px 8px;flex-shrink:0}
+.reuniao-itens{display:flex;flex-direction:column;gap:4px}
+.reuniao-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);line-height:1.5;padding:4px 0;border-top:1px solid var(--bd)}
+.reuniao-item:first-child{border-top:none;padding-top:0}
+.reuniao-item-check{width:14px;height:14px;border-radius:3px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.reuniao-item-check.done{background:var(--grn-a)}
+.reuniao-item-check.done svg{display:block!important}
+.reuniao-item-check svg{width:9px;height:9px;stroke:var(--grn);stroke-width:2.5;display:none}
+.reuniao-item-texto{flex:1}
+.reuniao-item-texto.done{text-decoration:line-through;opacity:.5}
+.reuniao-empty{text-align:center;padding:48px 24px;font-size:13px;color:var(--tx3)}
+.reuniao-empty-icon{font-size:36px;margin-bottom:12px}
+
+/* ─── INDICADORES SEMANAIS ───────────────────── */
+.ind-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
+.ind-col{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 8px;text-align:center;transition:border-color .15s}
+.ind-col.ind-hoje{border-color:var(--acc);background:var(--acc-b)}
+.ind-col-dia{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:6px}
+.ind-col.ind-hoje .ind-col-dia{color:var(--acc)}
+.ind-col-pct{font-size:22px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em;color:var(--tx);line-height:1}
+.ind-col.ind-hoje .ind-col-pct{color:var(--acc)}
+.ind-col-bar{height:3px;background:var(--s4);border-radius:99px;margin:6px 0 4px;overflow:hidden}
+.ind-col-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--grn));transition:width .5s ease}
+.ind-col-sub{font-size:9px;color:var(--tx3);font-family:var(--mono)}
+.ind-resumo-row{display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.ind-kpi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 16px;flex:1;min-width:80px}
+.ind-kpi-num{font-size:24px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em;color:var(--tx);line-height:1}
+.ind-kpi-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-top:4px}
+
 /* ─── CONFIG ─────────────────────────────────── */
 .config-section{margin-bottom:28px}
 .config-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--bd)}
@@ -415,7 +504,24 @@ textarea{resize:vertical}
 
   /* Streak badge */
   .streak-badge{font-size:10px;padding:3px 9px}
+
+  /* Reuniões mobile */
+  #reuniao-tipo-filter{width:100%!important}
+  #reuniao-search{width:100%!important}
+  #page-reunioes > div:first-child > div:last-child{flex-direction:column;width:100%}
+  .reuniao-card{padding:12px 14px}
+  .reuniao-card-title{font-size:13px}
+
+  /* Indicadores mobile */
+  .ind-grid{grid-template-columns:repeat(5,minmax(48px,1fr));gap:4px}
+  .ind-col-pct{font-size:17px}
+  .ind-resumo-row{gap:6px}
+  .ind-kpi-num{font-size:20px}
 }
+/* ─── ABAS INTERNAS (tab switcher) ───────────── */
+.tab-btn{background:none;border:none;cursor:pointer;padding:6px 16px;border-radius:4px;font-size:12px;font-weight:600;font-family:var(--sans);color:var(--tx2);transition:all .12s}
+.tab-btn:hover{color:var(--tx)}
+.tab-btn.tab-active{background:var(--s3);color:var(--tx);box-shadow:0 1px 4px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -430,14 +536,24 @@ textarea{resize:vertical}
     <div class="search-results" id="search-results"></div>
   </div>
   <div class="sb-section">
-    <div class="sb-lbl">Menu</div>
+    <div class="sb-lbl">Dia a dia</div>
     <button class="sb-item active" onclick="navTo('hoje',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M1 6h14M5 2v2M11 2v2"/></svg>Hoje</button>
-    <button class="sb-item" onclick="navTo('diario',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="12" height="14" rx="2"/><path d="M5 6h6M5 9h4"/></svg>Diário</button>
+    <button class="sb-item" onclick="navTo('diario',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="12" height="14" rx="2"/><path d="M5 6h6M5 9h4"/></svg>Registro do dia</button>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sb-section">
+    <div class="sb-lbl">Visão geral</div>
+    <button class="sb-item" onclick="navTo('indicadores',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="9" width="3" height="6" rx="1"/><rect x="6" y="5" width="3" height="10" rx="1"/><rect x="11" y="1" width="3" height="14" rx="1"/></svg>Indicadores</button>
     <button class="sb-item" onclick="navTo('semana',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M1 6h14M4 9h2M7 9h2M10 9h2"/></svg>Semana</button>
     <button class="sb-item" onclick="navTo('mes',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M1 6h14M5 2v2M11 2v2"/></svg>Mês</button>
-    <button class="sb-item" onclick="navTo('add',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/></svg>Adicionar</button>
-    <button class="sb-item" onclick="navTo('gerenciar',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h5"/><path d="M11 10l1.5 1.5L15 9"/></svg>Gerenciar</button>
-    <button class="sb-item" onclick="navTo('config',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>Config</button>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sb-section">
+    <div class="sb-lbl">Configurar</div>
+    <button class="sb-item" onclick="navTo('tarefas',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h5"/><path d="M11 10l1.5 1.5L15 9"/></svg>Tarefas</button>
+    <button class="sb-item" onclick="navTo('reunioes',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><circle cx="11" cy="5" r="2"/><path d="M1 13c0-2.2 2-4 5-4s5 1.8 5 4"/><path d="M13 13c0-1.5-1-2.8-2.5-3.3"/></svg>Anotações</button>
+    <button class="sb-item" onclick="navTo('bordo',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 6h8M2 9h10M2 12h6"/><circle cx="13" cy="11" r="2.5"/><path d="M13 9v2M11.5 11h3"/></svg>Diário de bordo</button>
+    <button class="sb-item" onclick="navTo('config',this)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>Configurações</button>
   </div>
   <div class="sb-div sb-mob-hide"></div>
   <div class="sb-section sb-mob-hide">
@@ -602,39 +718,174 @@ textarea{resize:vertical}
     <div class="cal-grid" id="cal-grid"></div>
   </div>
 
-  <!-- ADICIONAR -->
-  <div id="page-add" class="page">
-    <div class="page-title">Adicionar</div>
-    <div class="page-sub">Preencha o formulário para adicionar uma tarefa.</div>
-    <div class="add-card">
-      <div class="add-card-title">Nova tarefa</div>
-      <div class="manual-grid" style="margin-bottom:12px">
-        <div class="form-field" style="grid-column:span 3"><label class="form-label">Nome</label><input type="text" id="m-nome" placeholder="Ex: Reunião com cliente"></div>
-        <div class="form-field"><label class="form-label">Tipo</label><select id="m-freq" onchange="toggleManualFields()"><option value="daily">Todo dia</option><option value="weekly">1x por semana</option><option value="demand">Sob demanda</option><option value="once">Data específica</option></select></div>
-        <div class="form-field"><label class="form-label">Horário</label><input type="time" id="m-hora"></div>
-        <div class="form-field" id="m-field-dia"><label class="form-label">Dia</label><select id="m-dia"><option value="">—</option><option value="seg">Segunda</option><option value="ter">Terça</option><option value="qua">Quarta</option><option value="qui">Quinta</option><option value="sex">Sexta</option></select></div>
-        <div class="form-field" id="m-field-data" style="display:none"><label class="form-label">Data</label><input type="date" id="m-data"></div>
-        <div class="form-field"><label class="form-label">Cor</label><select id="m-cor"><option value="blue">Azul</option><option value="green">Verde</option><option value="amber">Âmbar</option><option value="red">Vermelho</option><option value="purple">Roxo</option><option value="gray">Cinza</option></select></div>
-        <div class="form-field" style="grid-column:span 3"><label class="form-label">Observação</label><input type="text" id="m-obs" placeholder="Opcional"></div>
+  <!-- TAREFAS (Adicionar + Gerenciar unificados) -->
+  <div id="page-tarefas" class="page">
+    <div class="page-title">Tarefas</div>
+    <div class="page-sub">Adicione, edite ou remova tarefas da rotina.</div>
+
+    <!-- Abas internas -->
+    <div style="display:flex;gap:2px;margin-bottom:20px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:3px;width:fit-content">
+      <button id="tab-add-btn" class="tab-btn tab-active" onclick="switchTab('add')">Nova tarefa</button>
+      <button id="tab-ger-btn" class="tab-btn" onclick="switchTab('ger')">Gerenciar</button>
+    </div>
+
+    <!-- Aba: Nova tarefa -->
+    <div id="tab-add">
+      <div class="add-card">
+        <div class="add-card-title">Nova tarefa</div>
+        <div class="manual-grid" style="margin-bottom:12px">
+          <div class="form-field" style="grid-column:span 3"><label class="form-label">Nome</label><input type="text" id="m-nome" placeholder="Ex: Reunião com cliente"></div>
+          <div class="form-field"><label class="form-label">Frequência</label><select id="m-freq" onchange="toggleManualFields()"><option value="daily">Todo dia</option><option value="weekly">1x por semana</option><option value="demand">Sob demanda</option><option value="once">Data específica</option></select></div>
+          <div class="form-field"><label class="form-label">Horário</label><input type="time" id="m-hora"></div>
+          <div class="form-field" id="m-field-dia"><label class="form-label">Dia</label><select id="m-dia"><option value="">—</option><option value="seg">Segunda</option><option value="ter">Terça</option><option value="qua">Quarta</option><option value="qui">Quinta</option><option value="sex">Sexta</option></select></div>
+          <div class="form-field" id="m-field-data" style="display:none"><label class="form-label">Data</label><input type="date" id="m-data"></div>
+          <div class="form-field"><label class="form-label">Tipo</label><select id="m-tipo"><option value="tarefa">📋 Tarefa</option><option value="reuniao">🤝 Reunião</option><option value="entrega">📦 Entrega</option><option value="ligacao">📞 Ligação</option><option value="revisao">🔍 Revisão</option></select></div>
+          <div class="form-field"><label class="form-label">Cor</label><select id="m-cor"><option value="blue">Azul</option><option value="green">Verde</option><option value="amber">Âmbar</option><option value="red">Vermelho</option><option value="purple">Roxo</option><option value="gray">Cinza</option></select></div>
+          <div class="form-field" style="grid-column:span 3"><label class="form-label">Observação</label><input type="text" id="m-obs" placeholder="Opcional"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" onclick="addManual()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>Adicionar tarefa</button></div>
+        <div class="ai-feedback" id="ai-feedback" style="margin-top:10px"></div>
       </div>
-      <div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" onclick="addManual()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 2v10M2 7h10"/></svg>Adicionar tarefa</button></div>
-      <div class="ai-feedback" id="ai-feedback" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Aba: Gerenciar -->
+    <div id="tab-ger" style="display:none">
+      <div class="sec"><div class="sec-title">Rotina fixa</div><div class="timeline" id="tl-fixed"></div></div>
+      <div class="sec"><div class="sec-title">Minhas tarefas</div><div class="timeline" id="tl-all"></div></div>
+      <div class="sec"><div class="sec-title">Eventos por data</div><div class="timeline" id="tl-events"></div></div>
     </div>
   </div>
 
-  <!-- GERENCIAR -->
-  <div id="page-gerenciar" class="page">
-    <div class="page-title">Gerenciar</div>
-    <div class="page-sub">Edite ou remova tarefas da rotina.</div>
-    <div class="sec"><div class="sec-title">Rotina fixa</div><div class="timeline" id="tl-fixed"></div></div>
-    <div class="sec"><div class="sec-title">Minhas tarefas</div><div class="timeline" id="tl-all"></div></div>
-    <div class="sec"><div class="sec-title">Eventos por data</div><div class="timeline" id="tl-events"></div></div>
+  <!-- BORDO -->
+  <div id="page-bordo" class="page">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px">
+      <div>
+        <div class="page-title" id="bordo-title">Diário de bordo</div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:3px" id="bordo-date"></div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="cal-btn" onclick="bordoHoje()">Hoje</button>
+        <button class="cal-btn" onclick="bordoPrev()">←</button>
+        <button class="cal-btn" onclick="bordoNext()">→</button>
+      </div>
+    </div>
+    <div class="bordo-grid">
+      <!-- Coluna principal -->
+      <div class="bordo-main">
+        <!-- O que resolvi -->
+        <div class="bordo-card">
+          <div class="bordo-card-title">
+            <span>✅ O que resolvi hoje</span>
+            <span class="bordo-saved" id="bordo-saved-resolvi">✓ salvo</span>
+          </div>
+          <textarea class="diario-textarea" id="bordo-resolvi" style="min-height:100px" placeholder="Liste o que você concluiu, resolveu ou avançou hoje..."></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px">
+            <button class="btn btn-primary" onclick="salvarBordo()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l3 3 7-7"/></svg>Salvar</button>
+          </div>
+        </div>
+        <!-- O que vai pra amanhã -->
+        <div class="bordo-card">
+          <div class="bordo-card-title">
+            <span>⏭ Para amanhã</span>
+            <span class="bordo-saved" id="bordo-saved-amanha">✓ salvo</span>
+          </div>
+          <textarea class="diario-textarea" id="bordo-amanha" style="min-height:80px" placeholder="O que não terminou hoje e precisa continuar amanhã..."></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px">
+            <button class="btn btn-primary" onclick="salvarBordo()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l3 3 7-7"/></svg>Salvar</button>
+          </div>
+        </div>
+        <!-- Pendências -->
+        <div class="bordo-card">
+          <div class="bordo-card-title">⚠ Pendências abertas</div>
+          <div id="pend-lista"></div>
+          <div class="pend-add">
+            <input id="pend-input" placeholder="Nova pendência..." autocomplete="off">
+            <button class="pend-add-btn" onclick="pendAdd()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 2v10M2 7h10"/></svg></button>
+          </div>
+        </div>
+        <!-- Linha do tempo -->
+        <div class="bordo-card">
+          <div class="bordo-card-title">🕐 Linha do tempo</div>
+          <div id="bordo-timeline"><div class="empty">Nenhum evento registrado ainda.</div></div>
+        </div>
+      </div>
+      <!-- Coluna lateral -->
+      <div class="bordo-side">
+        <!-- Recados rápidos (sticky) -->
+        <div class="sticky">
+          <div class="sticky-title">📌 Recados rápidos</div>
+          <textarea class="sticky-textarea" id="bordo-sticky" placeholder="Lembretes do dia, recados, avisos..."></textarea>
+        </div>
+        <!-- Termômetro da semana -->
+        <div class="bordo-card" style="margin-bottom:0">
+          <div class="bordo-card-title">Como foi o dia?</div>
+          <div class="term-row" id="term-row">
+            <div class="term-op" onclick="termSelect('pessimo')" data-val="pessimo"><div>😤</div><div class="term-op-lbl">Péssimo</div></div>
+            <div class="term-op" onclick="termSelect('ruim')" data-val="ruim"><div>😕</div><div class="term-op-lbl">Ruim</div></div>
+            <div class="term-op" onclick="termSelect('ok')" data-val="ok"><div>😐</div><div class="term-op-lbl">Ok</div></div>
+            <div class="term-op" onclick="termSelect('bom')" data-val="bom"><div>😊</div><div class="term-op-lbl">Bom</div></div>
+            <div class="term-op" onclick="termSelect('otimo')" data-val="otimo"><div>🚀</div><div class="term-op-lbl">Ótimo</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REUNIÕES -->
+  <div id="page-reunioes" class="page">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap">
+      <div>
+        <div class="page-title">Anotações</div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:3px">Histórico de anotações por tarefa ou reunião</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="reuniao-tipo-filter" onchange="renderReunioes()" style="width:140px;padding:7px 10px;font-size:12px;background:var(--s2)">
+          <option value="">Todos os tipos</option>
+          <option value="reuniao">🤝 Reunião</option>
+          <option value="entrega">📦 Entrega</option>
+          <option value="ligacao">📞 Ligação</option>
+          <option value="revisao">🔍 Revisão</option>
+          <option value="tarefa">📋 Tarefa</option>
+        </select>
+        <input class="search-input" id="reuniao-search" placeholder="Buscar por nome ou conteúdo..." oninput="renderReunioes()" style="width:240px;background:var(--s2)">
+      </div>
+    </div>
+    <div id="reunioes-lista"></div>
+  </div>
+
+  <!-- INDICADORES -->
+  <div id="page-indicadores" class="page">
+    <div class="page-title">Indicadores</div>
+    <div class="page-sub">Performance semanal de conclusão de tarefas.</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px;font-weight:700" id="ind-semana-label">—</div>
+      <div style="display:flex;gap:4px">
+        <button class="cal-btn" onclick="indHoje()">Hoje</button>
+        <button class="cal-btn" onclick="indPrev()">←</button>
+        <button class="cal-btn" onclick="indNext()">→</button>
+      </div>
+    </div>
+
+    <!-- KPIs resumo -->
+    <div class="ind-resumo-row" id="ind-kpis"></div>
+
+    <!-- Grade semanal -->
+    <div class="sec-title">Conclusão por dia</div>
+    <div class="ind-grid" id="ind-grid"></div>
+
+    <!-- Melhor dia / Pior dia -->
+    <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap" id="ind-destaques"></div>
+
+    <!-- Histórico das últimas 4 semanas -->
+    <div class="sec-title" style="margin-top:22px">Últimas 4 semanas</div>
+    <div id="ind-historico"></div>
   </div>
 
   <!-- CONFIG -->
   <div id="page-config" class="page">
-    <div class="page-title">Config</div>
-    <div class="page-sub">Dados e preferências.</div>
+    <div class="page-title">Configurações</div>
+    <div class="page-sub">Sincronização, exportação e preferências.</div>
     <div class="config-section">
       <div class="sec-title">Google Sheets</div>
       <div class="add-card" style="padding:18px 20px">
@@ -688,6 +939,7 @@ textarea{resize:vertical}
       <div class="form-field"><label class="form-label">Data</label><input type="date" id="e-data"></div>
     </div>
     <div class="form-row">
+      <div class="form-field"><label class="form-label">Tipo</label><select id="e-tipo"><option value="tarefa">📋 Tarefa</option><option value="reuniao">🤝 Reunião</option><option value="entrega">📦 Entrega</option><option value="ligacao">📞 Ligação</option><option value="revisao">🔍 Revisão</option></select></div>
       <div class="form-field"><label class="form-label">Cor</label><select id="e-cor"><option value="blue">Azul</option><option value="green">Verde</option><option value="amber">Âmbar</option><option value="red">Vermelho</option><option value="purple">Roxo</option><option value="gray">Cinza</option></select></div>
       <div class="form-field" style="flex:2"><label class="form-label">Observação</label><input type="text" id="e-obs"></div>
     </div>
@@ -772,6 +1024,7 @@ function loadLocal() {
   try { userTasks  = JSON.parse(ls(SK_TAREFAS)) || []; } catch(e) { userTasks  = []; }
   try { diarioData = JSON.parse(ls(SK_DIARIO))  || {}; } catch(e) { diarioData = {}; }
 
+  loadBordo();
   // Migrar dados de versões anteriores se localStorage novo estiver vazio
   if (!userTasks.length) {
     try {
@@ -1140,7 +1393,8 @@ function renderDiario() {
 
 function toggleCheck(iso, taskId) {
   const tid = String(taskId);
-  if (!diarioData[iso]) diarioData[iso] = {checks:{}, note:''};
+  if (!diarioData[iso]) diarioData[iso] = {checks:{}, note:'', notas:{}};
+  if (!diarioData[iso].notas) diarioData[iso].notas = {};
   diarioData[iso].checks[tid] = !diarioData[iso].checks[tid];
   saveDiario();
   sheetsPost('save_diario', {data:iso, checks:diarioData[iso].checks, note:diarioData[iso].note||'', notas:diarioData[iso].notas||{}});
@@ -1151,7 +1405,8 @@ function toggleCheck(iso, taskId) {
 let _diarioTimer = null;
 function salvarDiario() {
   const iso = diarioISO(diarioDate);
-  if (!diarioData[iso]) diarioData[iso] = {checks:{}, note:''};
+  if (!diarioData[iso]) diarioData[iso] = {checks:{}, note:'', notas:{}};
+  if (!diarioData[iso].notas) diarioData[iso].notas = {};
   diarioData[iso].note = document.getElementById('diario-text').value;
   saveDiario();
   sheetsPost('save_diario', {data:iso, checks:diarioData[iso].checks||{}, note:diarioData[iso].note, notas:diarioData[iso].notas||{}});
@@ -1236,6 +1491,8 @@ function openEdit(id) {
   document.getElementById('e-data').value = t.data||'';
   document.getElementById('e-cor').value  = t.cor||'blue';
   document.getElementById('e-obs').value  = t.obs||'';
+  const eTipo = document.getElementById('e-tipo');
+  if (eTipo) eTipo.value = t.tipo||'tarefa';
   document.getElementById('modal-edit').dataset.mode = 'user';
   document.getElementById('modal-edit').classList.add('open');
 }
@@ -1252,6 +1509,7 @@ function saveEdit() {
   if (!isFixed) t.data = document.getElementById('e-data').value;
   t.cor  = document.getElementById('e-cor').value;
   t.obs  = document.getElementById('e-obs').value.trim();
+  if (!isFixed) t.tipo = document.getElementById('e-tipo') ? document.getElementById('e-tipo').value : (t.tipo||'tarefa');
   if (!isFixed) { saveLocal(); sheetsPost('save_tarefas', {tarefas:userTasks}); }
   render();
   closeModal('modal-edit');
@@ -1296,6 +1554,7 @@ function addManual() {
     data:  freq==='once'   ? document.getElementById('m-data').value : '',
     cor:   document.getElementById('m-cor').value,
     obs:   document.getElementById('m-obs').value.trim(),
+    tipo:  document.getElementById('m-tipo') ? document.getElementById('m-tipo').value : 'tarefa',
     fixed: false,
   };
   userTasks.push(t);
@@ -1365,8 +1624,20 @@ function removeDayTask(id, iso) {
   render();
 }
 
-// ═══════════════════════════════════════
-// PESQUISA
+function switchTab(tab) {
+  const addEl = document.getElementById('tab-add');
+  const gerEl = document.getElementById('tab-ger');
+  const addBtn = document.getElementById('tab-add-btn');
+  const gerBtn = document.getElementById('tab-ger-btn');
+  if (!addEl || !gerEl) return;
+  const isAdd = tab === 'add';
+  addEl.style.display = isAdd ? 'block' : 'none';
+  gerEl.style.display = isAdd ? 'none' : 'block';
+  if (addBtn) { addBtn.classList.toggle('tab-active', isAdd); }
+  if (gerBtn) { gerBtn.classList.toggle('tab-active', !isAdd); }
+  if (!isAdd) renderTarefas();
+}
+
 // ═══════════════════════════════════════
 function onSearch(q) {
   const res = document.getElementById('search-results');
@@ -1382,17 +1653,20 @@ function onSearch(q) {
 function closeSearch() { document.getElementById('search-results').classList.remove('open'); document.getElementById('search-input').value=''; }
 function searchGoTo(id) {
   closeSearch();
-  const btn = Array.from(document.querySelectorAll('.sb-item')).find(b=>b.textContent.trim()==='Gerenciar');
-  if (btn) navTo('gerenciar', btn);
+  const btn = Array.from(document.querySelectorAll('.sb-item')).find(b=>b.textContent.trim()==='Tarefas');
+  if (btn) navTo('tarefas', btn);
   setTimeout(() => {
-    document.querySelectorAll('#tl-fixed .task-row,#tl-all .task-row,#tl-events .task-row').forEach(r => {
-      if (r.innerHTML.includes('\x27'+id+'\x27')||r.innerHTML.includes('"'+id+'"')) {
-        r.scrollIntoView({behavior:'smooth',block:'center'});
-        r.style.outline='2px solid var(--acc)';
-        setTimeout(()=>r.style.outline='',1500);
-      }
-    });
-  }, 150);
+    switchTab('ger');
+    setTimeout(() => {
+      document.querySelectorAll('#tl-fixed .task-row,#tl-all .task-row,#tl-events .task-row').forEach(r => {
+        if (r.innerHTML.includes('\x27'+id+'\x27')||r.innerHTML.includes('"'+id+'"')) {
+          r.scrollIntoView({behavior:'smooth',block:'center'});
+          r.style.outline='2px solid var(--acc)';
+          setTimeout(()=>r.style.outline='',1500);
+        }
+      });
+    }, 100);
+  }, 100);
 }
 
 function buildChips() {}
@@ -1403,8 +1677,21 @@ function buildChips() {}
 function navTo(page, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(s=>s.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
+  // compatibilidade: 'add' e 'gerenciar' agora são 'tarefas'
+  if (page === 'add' || page === 'gerenciar') {
+    const tab = page === 'gerenciar' ? 'ger' : 'add';
+    page = 'tarefas';
+    setTimeout(() => switchTab(tab), 10);
+  }
+  const pageEl = document.getElementById('page-'+page);
+  if (pageEl) pageEl.classList.add('active');
   if (el) el.classList.add('active');
+  if (page==='reunioes') { renderReunioes(); }
+  if (page==='indicadores') { renderIndicadores(); }
+  if (page==='bordo') {
+    if (!bordoDate||isNaN(bordoDate.getTime())){ bordoDate=new Date(); bordoDate.setHours(0,0,0,0); }
+    renderBordo();
+  }
   if (page==='diario') {
     if (!diarioDate||isNaN(diarioDate.getTime())) { diarioDate=new Date(); diarioDate.setHours(0,0,0,0); }
     renderDiario();
@@ -1726,6 +2013,7 @@ async function carregarDoSheets() {
         data:    normData(t.data),   // 1899 vira ''
         cor:     String(t.cor||'blue'),
         obs:     String(t.obs||''),
+        tipo:    t.tipo || 'tarefa',
         fixed:   false,
         isBreak: false,
       }));
@@ -1733,13 +2021,21 @@ async function carregarDoSheets() {
     }
 
     if (d.diario && typeof d.diario === 'object') {
-      diarioData = {};
+      // Merge: não zeramos o diarioData local, apenas atualizamos/adicionamos entradas do Sheets
       Object.entries(d.diario).forEach(([iso, entry]) => {
         const normChecks = {};
         Object.entries(entry.checks || {}).forEach(([k, v]) => { normChecks[String(k)] = v; });
         const normNotas = {};
         Object.entries(entry.notas || {}).forEach(([k, v]) => { normNotas[String(k)] = v; });
-        diarioData[normData(iso) || iso] = {checks: normChecks, note: entry.note || '', notas: normNotas};
+        const isoNorm = normData(iso) || iso;
+        if (!isoNorm) return;
+        // Preservar notas locais que não vieram do Sheets
+        const localNotas = (diarioData[isoNorm] || {}).notas || {};
+        diarioData[isoNorm] = {
+          checks: normChecks,
+          note: entry.note || '',
+          notas: { ...localNotas, ...normNotas },
+        };
       });
       saveDiario();
     }
@@ -1752,6 +2048,8 @@ async function carregarDoSheets() {
 
     render();
     if (document.getElementById('page-diario').classList.contains('active')) renderDiario();
+    carregarBordoDoSheets(d);
+    if (document.getElementById('page-reunioes').classList.contains('active')) renderReunioes();
     renderAside();
     setSyncStatus('Sincronizado ✓');
   } catch(e) {
@@ -1812,8 +2110,14 @@ function _carregarItems(taskId, iso){
   const notas = entry.notas||{};
   const raw   = notas[String(taskId)];
   if (!raw) return [];
+  // Formato atual: {items:[...], _obs:'...'}
+  if (raw && typeof raw === 'object' && !Array.isArray(raw) && Array.isArray(raw.items)) {
+    return raw.items.map(i => typeof i==='string' ? {texto:i,resolved:false} : {...i});
+  }
+  // Formato antigo: array direto
+  if (Array.isArray(raw)) return raw.map(i => typeof i==='string' ? {texto:i,resolved:false} : {...i});
+  // Formato muito antigo: string com quebras de linha
   if (typeof raw === 'string') return raw.split('\n').filter(l=>l.trim()).map(l=>({texto:l,resolved:false}));
-  if (Array.isArray(raw)) return raw.map(i=>typeof i==='string'?{texto:i,resolved:false}:{...i});
   return [];
 }
 
@@ -1884,6 +2188,15 @@ function _abrirModal(taskId, iso, readOnly){
   if (bar)    bar.style.background=_notaBarColor(t.cor);
   if (saved)  saved.style.opacity='0';
   if (addRow) addRow.style.display=readOnly?'none':'flex';
+  const obsWrap=document.getElementById('nota-obs-wrap');
+  if (obsWrap) obsWrap.style.display='block';
+  // Carregar observações gerais
+  const _entryObs = diarioData[iso]||{};
+  const _notasObs = _entryObs.notas||{};
+  const _rawObs   = _notasObs[String(taskId)];
+  const _obsTexto = (_rawObs && typeof _rawObs==='object' && _rawObs._obs) ? _rawObs._obs : '';
+  const taObs2    = document.getElementById('nota-obs-texto');
+  if (taObs2) { taObs2.value=_obsTexto; taObs2.readOnly=readOnly; taObs2.style.opacity=readOnly&&!_obsTexto?'0.5':'1'; }
   if (btns)   btns.style.display=readOnly?'none':'flex';
 
   _montarItems();
@@ -1902,7 +2215,9 @@ function salvarNota(){
   });
   if (!diarioData[_notaISO]) diarioData[_notaISO]={checks:{},note:'',notas:{}};
   if (!diarioData[_notaISO].notas) diarioData[_notaISO].notas={};
-  diarioData[_notaISO].notas[_notaTaskId]=_notaItems;
+  const taObs=document.getElementById('nota-obs-texto');
+  const obsVal=taObs?taObs.value:'';
+  diarioData[_notaISO].notas[_notaTaskId]={items:_notaItems,_obs:obsVal};
   saveDiario();
   sheetsPost('save_diario',{
     data:   _notaISO,
@@ -1922,9 +2237,440 @@ function temNota(taskId,iso){
   if (!raw) return false;
   if (typeof raw==='string') return raw.trim().length>0;
   if (Array.isArray(raw)) return raw.length>0;
+  // formato atual: {items:[...], _obs:'...'}
+  if (typeof raw==='object' && !Array.isArray(raw)) {
+    return (Array.isArray(raw.items) && raw.items.length>0) || (typeof raw._obs==='string' && raw._obs.trim().length>0);
+  }
   return false;
 }
 
+
+// ═══════════════════════════════════════
+// DIÁRIO DE BORDO
+// ═══════════════════════════════════════
+// Estrutura: bordoData[iso] = {
+//   resolvi, amanha, sticky, pendencias:[{texto,done}], termometro, timeline:[{hora,tipo,desc}]
+// }
+
+const SK_BORDO = 'r_bordo';
+let bordoData  = {};
+let bordoDate  = null;
+let _bordoStickyTimer = null;
+let _bordoTimer = null;
+
+function loadBordo(){
+  try { bordoData = JSON.parse(localStorage.getItem(SK_BORDO)) || {}; } catch(e){ bordoData={}; }
+}
+function saveBordo(){ localStorage.setItem(SK_BORDO, JSON.stringify(bordoData)); }
+
+function bordoISO(d){ try{ return d.toISOString().slice(0,10); }catch(e){ return isoToday(); } }
+function bordoHoje(){ bordoDate=new Date(); bordoDate.setHours(0,0,0,0); renderBordo(); }
+function bordoPrev(){ bordoDate=addDays(bordoDate,-1); renderBordo(); }
+function bordoNext(){ bordoDate=addDays(bordoDate,1); renderBordo(); }
+
+function bordoEntry(iso){
+  if (!bordoData[iso]) bordoData[iso] = {resolvi:'',amanha:'',sticky:'',pendencias:[],termometro:'',timeline:[]};
+  return bordoData[iso];
+}
+
+function renderBordo(){
+  if (!bordoDate || isNaN(bordoDate.getTime())){ bordoDate=new Date(); bordoDate.setHours(0,0,0,0); }
+  const iso   = bordoISO(bordoDate);
+  const entry = bordoEntry(iso);
+  const isToday = iso === isoToday();
+
+  // Header
+  const tit = document.getElementById('bordo-title');
+  const dat = document.getElementById('bordo-date');
+  if (tit) tit.textContent = isToday ? 'Diário de bordo' : 'Bordo — '+bordoDate.getDate()+' de '+MESES_FULL[bordoDate.getMonth()];
+  if (dat) dat.textContent = DNAMES[bordoDate.getDay()]+', '+bordoDate.getDate()+' de '+MESES_FULL[bordoDate.getMonth()]+' de '+bordoDate.getFullYear();
+
+  // Campos
+  const r = document.getElementById('bordo-resolvi');
+  const a = document.getElementById('bordo-amanha');
+  const s = document.getElementById('bordo-sticky');
+  if (r) r.value = entry.resolvi || '';
+  if (a) a.value = entry.amanha  || '';
+  if (s) s.value = entry.sticky  || '';
+
+  // Saved indicators
+  ['bordo-saved-resolvi','bordo-saved-amanha'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.classList.remove('show');
+  });
+
+  // Pendências
+  renderPendencias(iso);
+
+  // Termômetro
+  document.querySelectorAll('.term-op').forEach(el=>{
+    el.classList.toggle('sel', el.dataset.val === entry.termometro);
+  });
+
+  // Linha do tempo
+  renderBordoTimeline(iso);
+}
+
+// ── Salvar bordo ──────────────────────────────────────────────
+function salvarBordo(){
+  const iso   = bordoISO(bordoDate);
+  const entry = bordoEntry(iso);
+  const r = document.getElementById('bordo-resolvi');
+  const a = document.getElementById('bordo-amanha');
+  if (r) entry.resolvi = r.value;
+  if (a) entry.amanha  = a.value;
+
+  // Registrar na linha do tempo
+  bordoAddTimeline(iso, 'diario', 'Bordo salvo');
+
+  saveBordo();
+  sheetsPost('save_bordo', {data: iso, entry: bordoData[iso]});
+
+  ['bordo-saved-resolvi','bordo-saved-amanha'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2000); }
+  });
+  renderBordoTimeline(iso);
+}
+
+// Auto-save sticky
+document.addEventListener('DOMContentLoaded', ()=>{
+  const st = document.getElementById('bordo-sticky');
+  if (st) st.addEventListener('input', ()=>{
+    clearTimeout(_bordoStickyTimer);
+    _bordoStickyTimer = setTimeout(()=>{
+      const iso = bordoISO(bordoDate);
+      bordoEntry(iso).sticky = st.value;
+      saveBordo();
+      sheetsPost('save_bordo', {data: iso, entry: bordoData[iso]});
+    }, 1000);
+  });
+  const pi = document.getElementById('pend-input');
+  if (pi) pi.addEventListener('keydown', e=>{ if(e.key==='Enter'){e.preventDefault();pendAdd();} });
+});
+
+// ── Pendências ────────────────────────────────────────────────
+function renderPendencias(iso){
+  const entry = bordoEntry(iso);
+  const lista = document.getElementById('pend-lista');
+  if (!lista) return;
+  const pends = entry.pendencias || [];
+  if (!pends.length){ lista.innerHTML='<div class="empty" style="padding:8px 0;font-size:12px;text-align:left">Nenhuma pendência aberta.</div>'; return; }
+  const sorted = [...pends.map((p,i)=>({...p,_i:i}))].sort((a,b)=>a.done-b.done);
+  lista.innerHTML = sorted.map(p=>`
+    <div class="pend-item${p.done?' done':''}">
+      <div class="pend-chk" onclick="pendToggle(${p._i})"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></div>
+      <div class="pend-text" contenteditable="${p.done?'false':'true'}" data-pidx="${p._i}" onblur="pendEdit(this)">${p.texto.replace(/</g,'&lt;')}</div>
+      <button class="pend-del" onclick="pendDel(${p._i})"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l10 10M12 2L2 12"/></svg></button>
+    </div>`).join('');
+}
+
+function pendAdd(){
+  const inp = document.getElementById('pend-input');
+  if (!inp) return;
+  const txt = inp.value.trim();
+  if (!txt) return;
+  const iso = bordoISO(bordoDate);
+  bordoEntry(iso).pendencias.unshift({texto:txt, done:false});
+  inp.value='';
+  bordoAddTimeline(iso, 'pend', 'Pendência: '+txt);
+  saveBordo();
+  sheetsPost('save_bordo', {data: iso, entry: bordoData[iso]});
+  renderPendencias(iso);
+  renderBordoTimeline(iso);
+  inp.focus();
+}
+
+function pendToggle(idx){
+  const iso = bordoISO(bordoDate);
+  const p   = bordoEntry(iso).pendencias[idx];
+  if (!p) return;
+  p.done = !p.done;
+  if (p.done) bordoAddTimeline(iso, 'pend', 'Resolveu: '+p.texto);
+  saveBordo();
+  sheetsPost('save_bordo', {data: iso, entry: bordoData[iso]});
+  renderPendencias(iso);
+  renderBordoTimeline(iso);
+}
+
+function pendEdit(el){
+  const iso = bordoISO(bordoDate);
+  const idx = parseInt(el.dataset.pidx);
+  if (bordoEntry(iso).pendencias[idx]) bordoEntry(iso).pendencias[idx].texto = el.innerText.trim();
+}
+
+function pendDel(idx){
+  const iso = bordoISO(bordoDate);
+  bordoEntry(iso).pendencias.splice(idx,1);
+  saveBordo();
+  sheetsPost('save_bordo', {data: iso, entry: bordoData[iso]});
+  renderPendencias(iso);
+}
+
+// ── Termômetro ────────────────────────────────────────────────
+function termSelect(val){
+  const iso = bordoISO(bordoDate);
+  bordoEntry(iso).termometro = val;
+  document.querySelectorAll('.term-op').forEach(el=> el.classList.toggle('sel', el.dataset.val===val));
+  saveBordo();
+  sheetsPost('save_bordo', {data: iso, entry: bordoData[iso]});
+}
+
+// ── Linha do tempo ────────────────────────────────────────────
+function bordoAddTimeline(iso, tipo, desc){
+  const entry = bordoEntry(iso);
+  if (!entry.timeline) entry.timeline = [];
+  const hora = new Date().toTimeString().slice(0,5);
+  // Evitar duplicatas consecutivas
+  const last = entry.timeline[entry.timeline.length-1];
+  if (last && last.desc===desc && last.hora===hora) return;
+  entry.timeline.push({hora, tipo, desc});
+}
+
+function renderBordoTimeline(iso){
+  const el = document.getElementById('bordo-timeline');
+  if (!el) return;
+  const entry  = bordoEntry(iso);
+  const events = entry.timeline || [];
+
+  // Adicionar automaticamente tarefas marcadas hoje
+  const todayISO = isoToday();
+  const autoEvents = [];
+  if (iso === todayISO){
+    const dk = DOWKEYS[new Date().getDay()]||'';
+    const tasks = allTasks().filter(t=>t.hora&&(t.freq==='daily'||(t.freq==='weekly'&&t.dia===dk)||(t.freq==='once'&&t.data===iso)));
+    const checks = (diarioData[iso]||{checks:{}}).checks||{};
+    tasks.forEach(t=>{
+      if (checks[String(t.id)]) autoEvents.push({hora:t.hora, tipo:'check', desc:'Concluiu: <strong>'+t.nome+'</strong>'});
+    });
+  }
+
+  const all = [...autoEvents, ...events].sort((a,b)=>a.hora.localeCompare(b.hora));
+  if (!all.length){ el.innerHTML='<div class="empty" style="font-size:12px">Nenhum evento ainda.</div>'; return; }
+
+  el.innerHTML = '<div class="tl-bordo">'+all.map(ev=>
+    '<div class="tl-ev c-'+ev.tipo+'"><div class="tl-ev-hora">'+ev.hora+'</div><div class="tl-ev-desc">'+ev.desc+'</div></div>'
+  ).join('')+'</div>';
+}
+
+// ── Integração com Sheets ─────────────────────────────────────
+function carregarBordoDoSheets(d){
+  if (!d || !d.bordo) return;
+  Object.entries(d.bordo).forEach(([iso, entry])=>{ bordoData[iso]=entry; });
+  saveBordo();
+  if (document.getElementById('page-bordo').classList.contains('active')) renderBordo();
+}
+
+// ═══════════════════════════════════════
+// REUNIÕES — histórico de anotações
+// ═══════════════════════════════════════
+
+function getReunioesTasks() {
+  // Tarefas que são reuniões — nome contém "reunião" ou freq=daily/weekly com hora de manhã
+  // Na prática: qualquer tarefa que tenha anotações salvas em qualquer dia
+  return allTasks();
+}
+
+function renderReunioes() {
+  const el = document.getElementById('reunioes-lista');
+  if (!el) return;
+
+  const busca = (document.getElementById('reuniao-search') || {value:''}).value.toLowerCase().trim();
+  const tipoFiltro = (document.getElementById('reuniao-tipo-filter') || {value:''}).value;
+
+  // Varrer todos os dias do diário que têm notas
+  const entradas = [];
+  Object.entries(diarioData).forEach(([iso, entry]) => {
+    const notas = entry.notas || {};
+    Object.entries(notas).forEach(([taskId, raw]) => {
+      const task = allTasks().find(t => String(t.id) === String(taskId));
+      if (!task) return;
+
+      // Filtrar por tipo
+      if (tipoFiltro && (task.tipo || 'tarefa') !== tipoFiltro) return;
+
+      // Converter para array de itens
+      let items = [];
+      let obsGeral = '';
+      if (typeof raw === 'string') {
+        items = raw.split('\n').filter(l=>l.trim()).map(l=>({texto:l,resolved:false}));
+      } else if (Array.isArray(raw)) {
+        items = raw.map(i => typeof i==='string' ? {texto:i,resolved:false} : i);
+      } else if (raw && typeof raw === 'object' && Array.isArray(raw.items)) {
+        items = raw.items.map(i => typeof i==='string' ? {texto:i,resolved:false} : i);
+        obsGeral = raw._obs || '';
+      }
+      if (!items.length && !obsGeral.trim()) return;
+
+      // Filtrar por busca
+      const textoCompleto = task.nome.toLowerCase() + ' ' + items.map(i=>i.texto).join(' ').toLowerCase() + ' ' + obsGeral.toLowerCase();
+      if (busca && !textoCompleto.includes(busca)) return;
+
+      entradas.push({ iso, task, items, obsGeral });
+    });
+  });
+
+  if (!entradas.length) {
+    el.innerHTML = '<div class="reuniao-empty"><div class="reuniao-empty-icon">📋</div>'+(busca||tipoFiltro ? 'Nenhuma anotação encontrada para os filtros aplicados.' : 'Nenhuma anotação registrada ainda.<br>Clique em uma tarefa para adicionar notas.')+'</div>';
+    return;
+  }
+
+  // Ordenar por data mais recente
+  entradas.sort((a,b) => b.iso.localeCompare(a.iso));
+
+  const tipoLabels = {reuniao:'🤝 Reunião',entrega:'📦 Entrega',ligacao:'📞 Ligação',revisao:'🔍 Revisão',tarefa:'📋 Tarefa'};
+
+  el.innerHTML = entradas.map(({iso, task, items, obsGeral}) => {
+    const [y,m,d] = iso.split('-').map(Number);
+    const dt = new Date(y,m-1,d);
+    const dataStr = DNAMES[dt.getDay()]+', '+d+' de '+MESES_PT[m-1]+' de '+y;
+    const total    = items.length;
+    const resolvidos = items.filter(i=>i.resolved).length;
+    const countLabel = resolvidos > 0 ? resolvidos+'/'+total+' resolvidos' : (total > 0 ? total+' item'+(total>1?'s':'') : 'obs');
+    const tipoTag = task.tipo && task.tipo !== 'tarefa'
+      ? '<span class="tipo-tag tipo-'+task.tipo+'" style="font-size:9px;padding:2px 6px">'+tipoLabels[task.tipo]+'</span>'
+      : '';
+
+    const itenHtml = items.map(item => {
+      const textoSafe = item.texto.replace(/</g,'&lt;');
+      const texto = busca && textoSafe.toLowerCase().includes(busca)
+        ? textoSafe.replace(new RegExp('(?![^<]*>)('+busca.replace(/[-[\]/{}()*+?.\^$|]/g,'\$&')+')','gi'),'<mark style="background:var(--amb-a);color:var(--amb);border-radius:2px;padding:0 2px">$1</mark>')
+        : textoSafe;
+      return '<div class="reuniao-item">'
+        +'<div class="reuniao-item-check'+(item.resolved?' done':'')+'"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5"/></svg></div>'
+        +'<div class="reuniao-item-texto'+(item.resolved?' done':'')+'">'+texto+'</div>'
+        +'</div>';
+    }).join('');
+
+    const obsHtml = obsGeral.trim()
+      ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd);font-size:11px;color:var(--tx3);white-space:pre-wrap;line-height:1.5">'+obsGeral.replace(/</g,'&lt;')+'</div>'
+      : '';
+
+    return '<div class="reuniao-card" onclick="abrirNota(\x27'+String(task.id)+'\x27,\x27'+iso+'\x27)">'
+      +'<div class="reuniao-card-header">'
+      +'<div class="tr-bar '+barClass(task.cor)+'" style="width:3px;height:36px;border-radius:99px;flex-shrink:0"></div>'
+      +'<div style="flex:1;min-width:0"><div class="reuniao-card-title">'+task.nome+tipoTag+'</div><div class="reuniao-card-date">'+dataStr+'</div></div>'
+      +'<div class="reuniao-card-count">'+countLabel+'</div>'
+      +'</div>'
+      +(itenHtml ? '<div class="reuniao-itens">'+itenHtml+'</div>' : '')
+      +obsHtml
+      +'</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// INDICADORES SEMANAIS
+// ═══════════════════════════════════════
+let _indBase = null; // segunda-feira da semana exibida
+
+function indHoje() { _indBase = getMondayOf(new Date()); renderIndicadores(); }
+function indPrev()  { _indBase = addDays(_indBase || getMondayOf(new Date()), -7); renderIndicadores(); }
+function indNext()  { _indBase = addDays(_indBase || getMondayOf(new Date()),  7); renderIndicadores(); }
+
+function _indCalcDia(iso) {
+  const dow  = new Date(iso+'T12:00:00').getDay();
+  const dk   = DOWKEYS[dow] || '';
+  const tasks = allTasks().filter(t =>
+    t.hora && (
+      t.freq === 'daily' ||
+      (t.freq === 'weekly' && t.dia === dk) ||
+      (t.freq === 'once'  && t.data === iso)
+    )
+  );
+  const checks = (diarioData[iso] || {checks:{}}).checks || {};
+  const feitas = tasks.filter(t => checks[String(t.id)]).length;
+  return { total: tasks.length, feitas, pct: tasks.length ? Math.round(feitas / tasks.length * 100) : null };
+}
+
+function renderIndicadores() {
+  if (!_indBase) _indBase = getMondayOf(new Date());
+  const todayISO = isoToday();
+  const dias = [0,1,2,3,4].map(i => {
+    const d   = addDays(_indBase, i);
+    const iso = d.toISOString().slice(0,10);
+    return { d, iso, ...WDAYS[i], ..._indCalcDia(iso) };
+  });
+
+  // Label da semana
+  const {week, year} = isoWeekNum(_indBase);
+  const fmt = d => String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+  const lbl = document.getElementById('ind-semana-label');
+  if (lbl) lbl.textContent = 'Semana '+week+' de '+year+' · '+fmt(_indBase)+' – '+fmt(addDays(_indBase,6));
+
+  // KPIs
+  const diasComDados  = dias.filter(d => d.pct !== null);
+  const mediaPct      = diasComDados.length ? Math.round(diasComDados.reduce((s,d)=>s+d.pct,0)/diasComDados.length) : null;
+  const totalFeitas   = dias.reduce((s,d)=>s+d.feitas,0);
+  const totalTarefas  = dias.reduce((s,d)=>s+d.total,0);
+  const streak        = calcStreak();
+
+  const kpisEl = document.getElementById('ind-kpis');
+  if (kpisEl) kpisEl.innerHTML = [
+    { num: mediaPct !== null ? mediaPct+'%' : '—', lbl: 'Média semanal', cor: mediaPct >= 80 ? 'var(--grn)' : mediaPct >= 50 ? 'var(--amb)' : 'var(--red)' },
+    { num: totalFeitas+'/'+totalTarefas, lbl: 'Tarefas feitas', cor: 'var(--tx)' },
+    { num: streak, lbl: 'Streak atual', cor: 'var(--amb)' },
+    { num: diasComDados.length, lbl: 'Dias registrados', cor: 'var(--acc)' },
+  ].map(k => '<div class="ind-kpi"><div class="ind-kpi-num" style="color:'+k.cor+'">'+k.num+'</div><div class="ind-kpi-lbl">'+k.lbl+'</div></div>').join('');
+
+  // Grade por dia
+  const gridEl = document.getElementById('ind-grid');
+  if (gridEl) gridEl.innerHTML = dias.map(d => {
+    const isHoje = d.iso === todayISO;
+    const pctVal = d.pct;
+    const barW   = pctVal !== null ? pctVal : 0;
+    const corPct = pctVal === null ? 'var(--tx3)' : pctVal >= 80 ? 'var(--grn)' : pctVal >= 50 ? 'var(--amb)' : pctVal > 0 ? 'var(--red)' : 'var(--tx3)';
+    return '<div class="ind-col'+(isHoje?' ind-hoje':'')+'">'
+      +'<div class="ind-col-dia">'+d.l.slice(0,3)+'</div>'
+      +'<div class="ind-col-pct" style="color:'+corPct+'">'+(pctVal !== null ? pctVal+'%' : '—')+'</div>'
+      +'<div class="ind-col-bar"><div class="ind-col-fill" style="width:'+barW+'%;background:'+corPct+'"></div></div>'
+      +'<div class="ind-col-sub">'+d.feitas+'/'+d.total+'</div>'
+      +'</div>';
+  }).join('');
+
+  // Destaques melhor/pior
+  const destEl = document.getElementById('ind-destaques');
+  if (destEl && diasComDados.length >= 2) {
+    const melhor = diasComDados.reduce((a,b) => b.pct > a.pct ? b : a);
+    const pior   = diasComDados.reduce((a,b) => b.pct < a.pct ? b : a);
+    destEl.innerHTML = [
+      { label:'🏆 Melhor dia', dia: melhor, cor:'var(--grn)' },
+      { label:'📉 Mais difícil', dia: pior,  cor:'var(--red)' },
+    ].map(x => '<div class="ind-kpi" style="flex:0 0 auto">'
+      +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);margin-bottom:6px">'+x.label+'</div>'
+      +'<div style="font-size:15px;font-weight:700;color:var(--tx)">'+x.dia.l+'</div>'
+      +'<div class="ind-kpi-num" style="color:'+x.cor+';font-size:20px">'+x.dia.pct+'%</div>'
+      +'</div>').join('');
+  } else if (destEl) destEl.innerHTML = '';
+
+  // Histórico últimas 4 semanas
+  const histEl = document.getElementById('ind-historico');
+  if (histEl) {
+    const rows = [];
+    for (let w = 0; w < 4; w++) {
+      const base = getMondayOf(addDays(getMondayOf(new Date()), -w * 7));
+      const wDias = [0,1,2,3,4].map(i => {
+        const d = addDays(base, i);
+        return _indCalcDia(d.toISOString().slice(0,10));
+      });
+      const com   = wDias.filter(d => d.pct !== null);
+      const media = com.length ? Math.round(com.reduce((s,d)=>s+d.pct,0)/com.length) : null;
+      const feitas = wDias.reduce((s,d)=>s+d.feitas,0);
+      const total  = wDias.reduce((s,d)=>s+d.total,0);
+      const {week:wn} = isoWeekNum(base);
+      const corBar = media === null ? 'var(--tx3)' : media >= 80 ? 'var(--grn)' : media >= 50 ? 'var(--amb)' : 'var(--red)';
+      rows.push({ wn, base, media, feitas, total, corBar });
+    }
+    histEl.innerHTML = rows.map(r => {
+      const fmt2 = d => String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');
+      const label = 'Semana '+r.wn+' · '+fmt2(r.base)+' – '+fmt2(addDays(r.base,6));
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:5px">'
+        +'<div style="flex:1;font-size:12px;color:var(--tx2)">'+label+'</div>'
+        +'<div style="width:120px;height:3px;background:var(--s4);border-radius:99px;flex-shrink:0"><div style="height:100%;width:'+(r.media||0)+'%;background:'+r.corBar+';border-radius:99px;transition:width .5s"></div></div>'
+        +'<div style="font-size:12px;font-weight:700;font-family:var(--mono);color:'+r.corBar+';min-width:36px;text-align:right">'+(r.media !== null ? r.media+'%' : '—')+'</div>'
+        +'<div style="font-size:11px;color:var(--tx3);font-family:var(--mono);min-width:40px;text-align:right">'+r.feitas+'/'+r.total+'</div>'
+        +'</div>';
+    }).join('');
+  }
+}
 
 // ═══════════════════════════════════════
 // INIT
@@ -1934,8 +2680,10 @@ calYear     = _now.getFullYear();
 calMonth    = _now.getMonth();
 semanaBase  = getMondayOf(_now);
 diarioDate  = new Date(_now); diarioDate.setHours(0,0,0,0);
+bordoDate   = new Date(_now); bordoDate.setHours(0,0,0,0);
 _miniCalY   = _now.getFullYear();
 _miniCalM   = _now.getMonth();
+_indBase    = getMondayOf(_now);
 
 loadLocal();
 toggleManualFields();
@@ -1960,8 +2708,12 @@ carregarDoSheets();
     </div>
     <div class="nota-lista" id="nota-lista"></div>
     <div class="nota-add-row" id="nota-add-row">
-      <input class="nota-add-input" id="nota-add-input" placeholder="Nova anotação..." autocomplete="off">
+      <input class="nota-add-input" id="nota-add-input" placeholder="Novo item..." autocomplete="off">
       <button class="nota-add-btn" onclick="notaAddItem()"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 2v10M2 7h10"/></svg></button>
+    </div>
+    <div id="nota-obs-wrap" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)">
+      <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--tx3);margin-bottom:8px">Observações gerais</div>
+      <textarea id="nota-obs-texto" class="diario-textarea" style="min-height:90px" placeholder="Contexto, decisões, observações sobre essa tarefa..."></textarea>
     </div>
     <div class="modal-actions" style="margin-top:14px">
       <button class="btn btn-ghost" onclick="closeModal('modal-nota')">Fechar</button>
