@@ -399,82 +399,77 @@ textarea{resize:vertical}
 @media(max-width:700px){
   html,body{overflow-x:hidden;max-width:100vw}
   .app{grid-template-columns:1fr;overflow-x:hidden;width:100%}
-  .main{padding:12px;width:100%;min-width:0;overflow-x:hidden}
+  .main{padding:12px 12px 80px;width:100%;min-width:0;overflow-x:hidden}
 
-  /* Sidebar — só logo + nav, sem seções extras */
-  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bd);width:100%;padding-bottom:0}
-  .sb-header{padding:10px 14px 8px}
-  .sb-sub{display:none}
-  .sb-section{padding:4px 10px;display:flex;flex-wrap:wrap;gap:4px}
-  .sb-item{width:auto;padding:6px 10px;font-size:11px;flex-shrink:0}
-  .sb-div,.sb-info,.sb-alert{display:none}
-  /* Esconder seções Expediente e Alerta completamente */
-  .sidebar > .sb-section:nth-child(5),
-  .sidebar > .sb-section:nth-child(6),
-  .sidebar > .sb-section:nth-child(7),
-  .sidebar > .sb-section:nth-child(8){display:none}
-  .search-wrap{padding:6px 10px}
-  .sb-mob-hide{display:none!important}
+  /* Sidebar — esconde no mobile, substituída por bottom nav */
+  .sidebar{display:none}
 
-  /* Topo hoje — 2 colunas, altura automática igual */
-  .hoje-top{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    margin-bottom:16px;
-    width:100%;
+  /* Bottom nav bar */
+  .mob-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:200;
+    background:var(--s1);border-top:1px solid var(--bd);
+    height:60px;align-items:stretch;
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
   }
-  .htop-card{
-    padding:12px 14px;
-    min-width:0;
-    min-height:90px;
-    overflow:hidden;
-    width:100%;
+  .mob-nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;border:none;background:none;cursor:pointer;
+    font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--tx3);transition:color .12s;font-family:var(--sans);
+    -webkit-tap-highlight-color:transparent;
   }
+  .mob-nav-item svg{width:20px;height:20px;stroke:currentColor;flex-shrink:0}
+  .mob-nav-item.active,.mob-nav-item:active{color:var(--acc)}
+  .mob-nav-item.active svg{stroke:var(--acc)}
 
-  /* Relógio */
+  /* Mais menu (overlay) */
+  .mob-more-overlay{
+    display:none;position:fixed;bottom:60px;left:0;right:0;z-index:199;
+    background:var(--s1);border-top:1px solid var(--bd);
+    padding:8px 12px 4px;
+  }
+  .mob-more-overlay.open{display:block}
+  .mob-more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  .mob-more-btn{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:4px;padding:10px 6px;border-radius:var(--r);border:1px solid var(--bd);
+    background:var(--s2);cursor:pointer;
+    font-size:10px;font-weight:600;color:var(--tx2);font-family:var(--sans);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mob-more-btn svg{width:18px;height:18px;stroke:currentColor}
+  .mob-more-btn.active{border-color:var(--acc);color:var(--acc);background:var(--acc-b)}
+
+  /* Topo hoje — 2 colunas */
+  .hoje-top{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;width:100%}
+  .htop-card{padding:12px 14px;min-width:0;min-height:90px;overflow:hidden;width:100%}
   .htop-clock-hm{font-size:26px;letter-spacing:-.03em}
   .htop-clock-s{font-size:11px}
   .htop-clock-date{font-size:9px;margin-top:5px;line-height:1.4}
-
-  /* Stats — forçar 3 colunas iguais */
   .htop-stats-row{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;width:100%;gap:0}
   .htop-stat{text-align:center;min-width:0}
   .htop-stat-num{font-size:24px;line-height:1}
   .htop-stat-lbl{font-size:8px;letter-spacing:.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .htop-stat-div{width:1px;height:28px;flex-shrink:0}
   .htop-prog-track{margin-top:10px}
-
-  /* Próxima tarefa */
   .next-name{font-size:12px;font-weight:700;word-break:break-word}
   .next-badge,.next-badge.soon{font-size:9px;padding:2px 7px;margin-bottom:6px}
   .next-time{font-size:10px}
-
-  /* Expediente */
   .exp-countdown{font-size:22px;letter-spacing:-.02em}
   .exp-sublabel{font-size:9px}
   .exp-done{font-size:12px}
-
-  /* Títulos página */
   .page-title{font-size:19px}
-
-  /* Tasks */
   .task-row,.tr-inner{min-width:0}
   .task-name{font-size:12px;white-space:normal;word-break:break-word}
   .task-note{font-size:10px}
   .task-time{min-width:34px;font-size:10px}
   .tag{font-size:8px;padding:1px 5px}
 
-  /* Semana — scroll horizontal por card */
-  #page-semana .week-grid{
-    display:flex;overflow-x:auto;gap:8px;
-    padding-bottom:8px;width:100%;
-    -webkit-overflow-scrolling:touch;
-    scroll-snap-type:x mandatory;
-  }
+  /* Semana */
+  #page-semana .week-grid{display:flex;overflow-x:auto;gap:8px;padding-bottom:8px;width:100%;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
   #page-semana .day-col{min-width:150px;flex-shrink:0;scroll-snap-align:start}
 
-  /* Calendário mobile — scroll horizontal */
+  /* Calendário */
   #page-mes{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .cal-nav{min-width:560px}
   .cal-grid{gap:3px;min-width:560px}
@@ -501,8 +496,6 @@ textarea{resize:vertical}
   .diario-date-label{font-size:14px}
   .check-item{padding:8px 10px}
   .check-label{font-size:12px}
-
-  /* Streak badge */
   .streak-badge{font-size:10px;padding:3px 9px}
 
   /* Reuniões mobile */
@@ -517,6 +510,10 @@ textarea{resize:vertical}
   .ind-col-pct{font-size:17px}
   .ind-resumo-row{gap:6px}
   .ind-kpi-num{font-size:20px}
+
+  /* Bordo mobile */
+  .bordo-grid{grid-template-columns:1fr}
+  .bordo-side{position:static}
 }
 /* ─── ABAS INTERNAS (tab switcher) ───────────── */
 .tab-btn{background:none;border:none;cursor:pointer;padding:6px 16px;border-radius:4px;font-size:12px;font-weight:600;font-family:var(--sans);color:var(--tx2);transition:all .12s}
@@ -2772,5 +2769,89 @@ carregarDoSheets();
     </div>
   </div>
 </div>
+<!-- BOTTOM NAV MOBILE -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-item active" id="mobnav-hoje" onclick="mobNav('hoje',this)">
+    <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M1 6h14M5 2v2M11 2v2"/></svg>
+    Hoje
+  </button>
+  <button class="mob-nav-item" id="mobnav-diario" onclick="mobNav('diario',this)">
+    <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="2" y="1" width="12" height="14" rx="2"/><path d="M5 6h6M5 9h4"/></svg>
+    Registro
+  </button>
+  <button class="mob-nav-item" id="mobnav-indicadores" onclick="mobNav('indicadores',this)">
+    <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5"><rect x="1" y="9" width="3" height="6" rx="1"/><rect x="6" y="5" width="3" height="10" rx="1"/><rect x="11" y="1" width="3" height="14" rx="1"/></svg>
+    Dados
+  </button>
+  <button class="mob-nav-item" id="mobnav-tarefas" onclick="mobNav('tarefas',this)">
+    <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v6M5 8h6"/></svg>
+    Tarefas
+  </button>
+  <button class="mob-nav-item" id="mobnav-mais" onclick="toggleMobMore(this)">
+    <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5"><circle cx="3" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="13" cy="8" r="1.2" fill="currentColor" stroke="none"/></svg>
+    Mais
+  </button>
+</nav>
+<!-- MAIS OVERLAY -->
+<div class="mob-more-overlay" id="mob-more-overlay" onclick="closeMobMore()">
+  <div class="mob-more-grid" onclick="event.stopPropagation()">
+    <button class="mob-more-btn" id="mobnav-semana" onclick="mobNav('semana',null);closeMobMore()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M1 6h14M4 9h2M7 9h2M10 9h2"/></svg>Semana
+    </button>
+    <button class="mob-more-btn" id="mobnav-mes" onclick="mobNav('mes',null);closeMobMore()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="12" rx="2"/><path d="M1 6h14M5 2v2M11 2v2"/></svg>Mês
+    </button>
+    <button class="mob-more-btn" id="mobnav-reunioes" onclick="mobNav('reunioes',null);closeMobMore()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="2.5"/><circle cx="11" cy="5" r="2"/><path d="M1 13c0-2.2 2-4 5-4s5 1.8 5 4"/><path d="M13 13c0-1.5-1-2.8-2.5-3.3"/></svg>Anotações
+    </button>
+    <button class="mob-more-btn" id="mobnav-bordo" onclick="mobNav('bordo',null);closeMobMore()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h12M2 6h8M2 9h10M2 12h6"/></svg>Bordo
+    </button>
+    <button class="mob-more-btn" id="mobnav-config" onclick="mobNav('config',null);closeMobMore()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/></svg>Config
+    </button>
+  </div>
+</div>
+<script>
+const _MOB_PAGES = ['hoje','diario','indicadores','tarefas','semana','mes','reunioes','bordo','config'];
+function mobNav(page, el) {
+  // Atualizar active nos botões da bottom nav
+  document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mob-more-btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+  // Marcar "Mais" como active se for uma sub-página
+  const subPages = ['semana','mes','reunioes','bordo','config'];
+  if (subPages.includes(page)) {
+    const maisBtn = document.getElementById('mobnav-mais');
+    if (maisBtn) maisBtn.classList.add('active');
+    const moreBtn = document.getElementById('mobnav-'+page);
+    if (moreBtn) moreBtn.classList.add('active');
+  }
+  // Navegar (usa o navTo existente mas sem passar el para não conflitar com sidebar)
+  navTo(page, null);
+  // Restaurar active na sidebar para não conflitar
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+}
+function toggleMobMore(btn) {
+  const ov = document.getElementById('mob-more-overlay');
+  if (!ov) return;
+  const isOpen = ov.classList.contains('open');
+  ov.classList.toggle('open', !isOpen);
+  btn.classList.toggle('active', !isOpen);
+}
+function closeMobMore() {
+  const ov = document.getElementById('mob-more-overlay');
+  if (ov) ov.classList.remove('open');
+  // Não remove o active do "Mais" se uma sub-página estiver ativa
+}
+// Fechar overlay ao clicar fora
+document.addEventListener('click', e => {
+  const ov = document.getElementById('mob-more-overlay');
+  const nav = document.getElementById('mob-nav');
+  if (ov && ov.classList.contains('open') && !ov.contains(e.target) && !nav.contains(e.target)) {
+    ov.classList.remove('open');
+  }
+});
+</script>
 </body>
 </html>
