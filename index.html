@@ -282,8 +282,54 @@ textarea{resize:vertical}
 .ai-feedback{font-size:12px;color:var(--tx2);margin-top:10px;min-height:18px;display:flex;align-items:center;gap:6px}
 .ai-feedback.ok{color:var(--grn)}.ai-feedback.err{color:var(--red)}
 
-@media(max-width:960px){.hoje-top{grid-template-columns:1fr 1fr}.htop-clock,.htop-stats{grid-column:span 1}}
-@media(max-width:700px){.app{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bd)}.main{padding:16px}.week-grid{grid-template-columns:1fr 1fr}.cal-day{min-height:60px;padding:4px}.manual-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:960px){
+  .hoje-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  /* App */
+  .app{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--bd)}
+  .main{padding:14px}
+
+  /* Sidebar mobile — horizontal compacto */
+  .sb-header{padding:14px 14px 10px}
+  .sb-section{padding:8px 10px 4px;display:flex;flex-wrap:wrap;gap:2px}
+  .sb-item{width:auto;padding:6px 10px;font-size:11px}
+  .sb-div{display:none}
+  .sb-info{display:none}
+  .sb-alert{display:none}
+  .sb-label{display:none}
+  .search-wrap{padding:8px 10px}
+
+  /* Topo hoje — 2x2 */
+  .hoje-top{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+  .htop-card{padding:12px 14px}
+  .htop-clock-hm{font-size:28px}
+  .htop-clock-s{font-size:12px}
+  .htop-clock-date{font-size:9px}
+  .htop-stat-num{font-size:26px}
+  .htop-stat-lbl{font-size:8px}
+  .htop-stat-div{height:30px}
+  .exp-countdown{font-size:18px}
+
+  /* Títulos */
+  .page-title{font-size:20px}
+
+  /* Semana — scroll horizontal */
+  .week-grid{grid-template-columns:repeat(5,minmax(140px,1fr));overflow-x:auto;padding-bottom:6px}
+
+  /* Calendário */
+  .cal-day{min-height:56px;padding:4px}
+  .cal-pill{font-size:8px}
+
+  /* Formulário */
+  .manual-grid{grid-template-columns:1fr 1fr}
+  .form-row{flex-direction:column}
+
+  /* Modal */
+  .modal{padding:18px;border-radius:var(--rl)}
+  .modal-title{font-size:14px}
+}
 </style>
 </head>
 <body>
