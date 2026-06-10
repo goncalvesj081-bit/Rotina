@@ -1020,9 +1020,38 @@ function ls(k, v) {
 function saveLocal() { ls(SK_TAREFAS, JSON.stringify(userTasks)); }
 function saveDiario() { ls(SK_DIARIO,  JSON.stringify(diarioData)); }
 
+function _migrarDiario(data) {
+  // Corrige entradas onde checks foi salvo com {checks:{...}, notas:{...}} aninhado
+  Object.keys(data).forEach(iso => {
+    const entry = data[iso];
+    if (!entry || typeof entry !== 'object') return;
+    const c = entry.checks || {};
+    // Detecta corrupção: objeto checks contém chave 'checks' ou 'notas'
+    if (c.checks !== undefined || c.notas !== undefined) {
+      const innerChecks = (typeof c.checks === 'object' && c.checks) ? c.checks : {};
+      const innerNotas  = (typeof c.notas  === 'object' && c.notas)  ? c.notas  : {};
+      // Extrai checks reais (booleanos no nível raiz, excluindo 'checks' e 'notas')
+      const realChecks = {};
+      Object.entries(c).forEach(([k, v]) => {
+        if (k !== 'checks' && k !== 'notas') realChecks[k] = v;
+      });
+      Object.entries(innerChecks).forEach(([k, v]) => { realChecks[k] = v; });
+      // Merge notas: notas já no entry têm prioridade
+      const existingNotas = entry.notas || {};
+      const mergedNotas = { ...innerNotas, ...existingNotas };
+      data[iso] = { checks: realChecks, note: entry.note || '', notas: mergedNotas };
+    }
+  });
+  return data;
+}
+
 function loadLocal() {
   try { userTasks  = JSON.parse(ls(SK_TAREFAS)) || []; } catch(e) { userTasks  = []; }
-  try { diarioData = JSON.parse(ls(SK_DIARIO))  || {}; } catch(e) { diarioData = {}; }
+  try {
+    const raw = JSON.parse(ls(SK_DIARIO)) || {};
+    diarioData = _migrarDiario(raw);
+    saveDiario(); // persiste já corrigido
+  } catch(e) { diarioData = {}; }
 
   loadBordo();
   // Migrar dados de versões anteriores se localStorage novo estiver vazio
@@ -2021,7 +2050,7 @@ async function carregarDoSheets() {
     }
 
     if (d.diario && typeof d.diario === 'object') {
-      // Merge: não zeramos o diarioData local, apenas atualizamos/adicionamos entradas do Sheets
+      // Merge seguro: Sheets atualiza checks e note, mas notas locais têm prioridade
       Object.entries(d.diario).forEach(([iso, entry]) => {
         const normChecks = {};
         Object.entries(entry.checks || {}).forEach(([k, v]) => { normChecks[String(k)] = v; });
@@ -2029,12 +2058,25 @@ async function carregarDoSheets() {
         Object.entries(entry.notas || {}).forEach(([k, v]) => { normNotas[String(k)] = v; });
         const isoNorm = normData(iso) || iso;
         if (!isoNorm) return;
-        // Preservar notas locais que não vieram do Sheets
-        const localNotas = (diarioData[isoNorm] || {}).notas || {};
+        const localEntry = diarioData[isoNorm] || {};
+        const localNotas = localEntry.notas || {};
+        // Merge por taskId: local tem prioridade (pode ter sido salvo mais recente)
+        // O Sheets só ganha se não existe localmente
+        const mergedNotas = { ...normNotas };
+        Object.keys(localNotas).forEach(tid => {
+          const localNota  = localNotas[tid];
+          const sheetsNota = normNotas[tid];
+          // Se só existe local, preserva sempre
+          if (!sheetsNota) { mergedNotas[tid] = localNota; return; }
+          // Se ambos existem: local vence a menos que Sheets seja explicitamente mais novo
+          const localTs  = (localNota  && localNota._savedAt)  ? localNota._savedAt  : Infinity;
+          const sheetsTs = (sheetsNota && sheetsNota._savedAt) ? sheetsNota._savedAt : 0;
+          mergedNotas[tid] = localTs >= sheetsTs ? localNota : sheetsNota;
+        });
         diarioData[isoNorm] = {
           checks: normChecks,
-          note: entry.note || '',
-          notas: { ...localNotas, ...normNotas },
+          note:   entry.note || localEntry.note || '',
+          notas:  mergedNotas,
         };
       });
       saveDiario();
@@ -2204,8 +2246,8 @@ function _abrirModal(taskId, iso, readOnly){
   if (!readOnly) setTimeout(()=>{const inp=document.getElementById('nota-add-input');if(inp)inp.focus();},100);
 }
 
-function abrirNota(taskId,iso){ _abrirModal(taskId,iso,false); }
-function verNota(taskId,iso)  { _abrirModal(taskId,iso,true);  }
+function abrirNota(taskId, iso){ _abrirModal(taskId, iso || isoToday(), false); }
+function verNota(taskId, iso)  { _abrirModal(taskId, iso || isoToday(), true);  }
 
 function salvarNota(){
   if (!_notaTaskId||!_notaISO) return;
@@ -2217,16 +2259,23 @@ function salvarNota(){
   if (!diarioData[_notaISO].notas) diarioData[_notaISO].notas={};
   const taObs=document.getElementById('nota-obs-texto');
   const obsVal=taObs?taObs.value:'';
-  diarioData[_notaISO].notas[_notaTaskId]={items:_notaItems,_obs:obsVal};
-  saveDiario();
+  // _savedAt garante que este dado local sempre vence no merge com Sheets
+  diarioData[_notaISO].notas[_notaTaskId]={items:_notaItems, _obs:obsVal, _savedAt:Date.now()};
+  saveDiario(); // salva imediatamente no localStorage — não depende do Sheets
+  const saved=document.getElementById('nota-saved');
+  if (saved){ saved.textContent='✓ salvo'; saved.style.color='var(--grn)'; saved.style.opacity='1'; }
+  // Enviar para Sheets em background
   sheetsPost('save_diario',{
     data:   _notaISO,
     checks: diarioData[_notaISO].checks||{},
     note:   diarioData[_notaISO].note||'',
     notas:  diarioData[_notaISO].notas||{},
+  }).then(res => {
+    if (!res || !res.ok) {
+      if (saved){ saved.textContent='⚠ salvo local'; saved.style.color='var(--amb)'; }
+    }
+    setTimeout(()=>{ if(saved) saved.style.opacity='0'; }, 3000);
   });
-  const saved=document.getElementById('nota-saved');
-  if (saved){saved.style.opacity='1';setTimeout(()=>saved.style.opacity='0',2000);}
   renderHoje();
 }
 
