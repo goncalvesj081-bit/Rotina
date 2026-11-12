@@ -6,6 +6,13 @@
 <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14151a" media="(prefers-color-scheme: dark)">
 <title>Rotina</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rotina">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root{
   --bg:#f6f5f2;--card:#ffffff;--soft:#efede8;--line:#e3e0d9;
@@ -33,7 +40,7 @@
 html{-webkit-text-size-adjust:100%}
 body{font-family:var(--font);background:var(--bg);color:var(--tx);font-size:15px;line-height:1.45;min-height:100vh;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-.wrap{max-width:680px;margin:0 auto;padding:24px 16px 80px}
+.wrap{max-width:680px;margin:0 auto;padding:calc(24px + env(safe-area-inset-top)) 16px calc(80px + env(safe-area-inset-bottom))}
 
 header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px}
 h1{font-size:26px;font-weight:700;letter-spacing:-.02em}
@@ -149,6 +156,7 @@ footer button:hover{color:var(--tx)}
     <button id="btnExport">Baixar backup</button>
     <button id="btnImport">Restaurar backup</button>
     <button id="btnClearDone">Apagar concluídas</button>
+    <button id="btnInstall" hidden>Instalar app</button>
     <input type="file" id="fileImport" accept="application/json" hidden>
   </footer>
 </div>
@@ -694,6 +702,18 @@ let lastDay = iso(today());
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && iso(today()) !== lastDay) { lastDay = iso(today()); render(); }
 });
+
+// app instalável + offline
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('btnInstall').hidden = false; });
+$('btnInstall').addEventListener('click', async () => {
+  if (!installEvt) return;
+  installEvt.prompt(); await installEvt.userChoice; installEvt = null; $('btnInstall').hidden = true;
+});
+window.addEventListener('appinstalled', () => { $('btnInstall').hidden = true; toast('App instalado ✓'); });
 
 window.__parse = parse; // útil para testes
 render();
