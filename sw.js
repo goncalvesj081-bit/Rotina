@@ -1,6 +1,6 @@
 // Cache simples para o app abrir sem internet. Sempre tenta a versão nova primeiro.
-const CACHE = 'rotina-v1';
-const FILES = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+const CACHE = 'rotina-v2';
+const FILES = ['./', './index.html', './style.css', './parser.js', './app.js', './extras.js', './manifest.json', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
 });
