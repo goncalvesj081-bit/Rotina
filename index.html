@@ -48,6 +48,12 @@ h1{font-size:26px;font-weight:700;letter-spacing:-.02em}
 #preview{flex:1;display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;color:var(--tx2)}
 .btn-add{background:var(--acc);color:#fff;border-radius:8px;padding:6px 14px;font-weight:600;font-size:14px}
 .btn-add:disabled{opacity:.35;cursor:default}
+.btn-mic{width:34px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--tx2);background:var(--soft)}
+.btn-mic:hover{color:var(--tx)}
+.btn-mic.rec{background:var(--red);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(214,64,58,.5)}70%{box-shadow:0 0 0 10px rgba(214,64,58,0)}100%{box-shadow:0 0 0 0 rgba(214,64,58,0)}}
+#ouvindo{font-size:13px;color:var(--red);margin-top:6px;display:none}
+#ouvindo.on{display:block}
 .hint{font-size:12.5px;color:var(--tx3);margin:8px 2px 0}
 .hint code{background:var(--soft);color:var(--tx2);padding:1px 5px;border-radius:4px;font-family:inherit}
 
@@ -126,10 +132,14 @@ footer button:hover{color:var(--tx)}
     <textarea id="entrada" rows="1" placeholder="O que você precisa fazer?" autocomplete="off"></textarea>
     <div class="composer-foot">
       <div id="preview"></div>
+      <button class="btn-mic" id="btnMic" hidden aria-label="Falar tarefa" title="Falar tarefa">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
+      </button>
       <button class="btn-add" id="btnAdd" disabled>Adicionar</button>
     </div>
   </div>
-  <p class="hint">Escreva do seu jeito: <code>pagar boleto amanhã!</code> <code>dentista sexta 14h</code> <code>academia todo dia</code> <code>relatório dia 20 #trabalho</code>. Pode colar várias, uma por linha.</p>
+  <div id="ouvindo">● Ouvindo… fale suas tarefas. Faça uma pausa ou diga “próxima tarefa” entre uma e outra. Toque no microfone para parar.</div>
+  <p class="hint">Escreva ou fale do seu jeito: <code>pagar boleto amanhã!</code> <code>dentista sexta 14h</code> <code>academia todo dia</code> <code>relatório dia 20 #trabalho</code>. Pode colar várias, uma por linha.</p>
 
   <div class="summary" id="summary"></div>
   <div class="filters" id="filters"></div>
@@ -207,6 +217,23 @@ function parse(raw) {
   };
   const t = today();
 
+  // números por extenso (comum quando vem de áudio)
+  const NUM = { um: 1, uma: 1, dois: 2, duas: 2, tres: 3, 'três': 3, quatro: 4, cinco: 5, seis: 6, sete: 7, oito: 8, nove: 9, dez: 10, onze: 11, doze: 12, quinze: 15, vinte: 20, trinta: 30 };
+  s = s.replace(/(^|\s)(um|uma|dois|duas|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|quinze|vinte|trinta)(?=\s+(dias?|horas?|da|de|e meia)\b)/giu,
+    (_, a, w) => a + NUM[w.toLowerCase()]);
+  s = s.replace(/(^|\s)(?:ao\s+)?meio[- ]dia(?:\s+e\s+meia)?(?=$|[\s,.;:!?)])/giu, (m, a) => a + (/meia/i.test(m) ? '12:30' : '12h'));
+  s = s.replace(/(^|\s)meia[- ]noite(?=$|[\s,.;:!?)])/giu, (_, a) => a + '0h');
+  // "3 da tarde", "8 da noite", "9 da manhã", "às 3 e meia da tarde", "15 horas"
+  s = s.replace(/(^|\s)(?:([àa]s|a partir das)\s+)?(\d{1,2})(?:\s*(?:horas?|h))?(\s+e\s+meia|:(\d{2}))?\s+(?:horas?\s+)?(da|de)\s+(manh[ãa]|tarde|noite|madrugada)(?=$|[\s,.;:!?)])/giu,
+    (_, a, as, h, extra, mins, __, per) => {
+      let hh = +h; const p = norm(per);
+      if ((p === 'tarde' || p === 'noite') && hh < 12) hh += 12;
+      const mm = extra ? (mins || '30') : '00';
+      return `${a}${pad(hh)}:${mm}`;
+    });
+  s = s.replace(/(^|\s)(\d{1,2})\s+horas?(?:\s+e\s+meia)?(?=$|[\s,.;:!?)])/giu, (m, a, h) => `${a}${pad(+h)}:${/meia/i.test(m) ? '30' : '00'}`);
+  s = s.replace(/(^|\s)(\d{1,2})\s+e\s+meia(?=$|[\s,.;:!?)])/giu, (_, a, h) => `${a}${pad(+h)}:30`);
+
   // recorrência
   take(S + '(todo dia|todos os dias|diariamente|di[áa]rio)' + END, () => { out.recur = { type: 'daily' }; });
   take(S + '(?:toda|todo|todas as|todos os)\\s+' + WD_RE + 's?' + END, m => {
@@ -257,7 +284,7 @@ function parse(raw) {
 
   // prioridade
   if (/!/.test(s)) { out.priority = 'alta'; s = s.replace(/!+/g, ' '); }
-  take(S + '(urgente|important[ei]|prioridade|prioridade alta|asap)' + END, () => { out.priority = 'alta'; });
+  take(S + '(é urgente|urgente|important[ei]|prioridade alta|prioridade|asap)' + END, () => { out.priority = 'alta'; });
   take(S + '(quando der|sem pressa|algum dia|baixa prioridade)' + END, () => { out.priority = 'baixa'; });
 
   // categoria explícita
@@ -482,6 +509,62 @@ entrada.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); addFromInput(); }
 });
 btnAdd.addEventListener('click', () => { addFromInput(); entrada.focus(); });
+
+/* ================= voz ================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const btnMic = $('btnMic');
+if (SR) {
+  btnMic.hidden = false;
+  let rec = null, listening = false, baseText = '', finalText = '';
+  // palavras que separam uma tarefa da outra quando você fala
+  const SPLIT = /\s*\b(?:pr[óo]xima tarefa|outra tarefa|nova tarefa|ponto final|tamb[ée]m preciso|e tamb[ée]m)\b[,.]?\s*/giu;
+  const toLines = txt => txt.replace(SPLIT, '\n').split('\n').map(l => l.trim().replace(/[.,]+$/, '')).filter(Boolean).join('\n');
+
+  const show = interim => {
+    const spoken = toLines(finalText + ' ' + interim);
+    entrada.value = [baseText, spoken].filter(Boolean).join('\n');
+    updatePreview();
+  };
+  const stop = () => {
+    listening = false;
+    btnMic.classList.remove('rec');
+    $('ouvindo').classList.remove('on');
+    try { rec && rec.stop(); } catch {}
+    entrada.focus();
+  };
+  const start = () => {
+    rec = new SR();
+    rec.lang = 'pt-BR';
+    rec.continuous = true;
+    rec.interimResults = true;
+    baseText = entrada.value.trim();
+    finalText = '';
+    rec.onresult = e => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) finalText += '\nnova tarefa ' + r[0].transcript; // cada pausa vira uma linha
+        else interim += r[0].transcript;
+      }
+      show(interim);
+    };
+    rec.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') toast('Permita o uso do microfone no navegador');
+      else if (e.error === 'no-speech') toast('Não ouvi nada. Tente de novo');
+      else if (e.error !== 'aborted') toast('Erro no áudio: ' + e.error);
+      stop();
+    };
+    // alguns navegadores param sozinhos depois de um tempo: reinicia enquanto estiver ligado
+    rec.onend = () => {
+      if (listening) { baseText = entrada.value.trim(); finalText = ''; try { rec.start(); } catch { stop(); } }
+    };
+    try { rec.start(); } catch { toast('Não consegui acessar o microfone'); return; }
+    listening = true;
+    btnMic.classList.add('rec');
+    $('ouvindo').classList.add('on');
+  };
+  btnMic.addEventListener('click', () => listening ? stop() : start());
+}
 
 /* ================= ações ================= */
 let undoFn = null, toastTimer = null;
