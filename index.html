@@ -19,7 +19,7 @@
 <div class="wrap">
   <header>
     <h1>Rotina</h1>
-    <div class="today" id="hojeLabel"></div>
+    <div class="hdr-right"><button class="sync-chip" id="syncChip" hidden></button><div class="today" id="hojeLabel"></div></div>
   </header>
 
   <div class="composer">
@@ -40,6 +40,7 @@
   <div id="lists"></div>
 
   <footer>
+    <button id="btnSync">☁ Sincronizar aparelhos</button>
     <button id="btnExport">Baixar backup</button>
     <button id="btnImport">Restaurar backup</button>
     <button id="btnClearDone">Apagar concluídas</button>
@@ -52,5 +53,6 @@
 <script src="parser.js"></script>
 <script src="app.js"></script>
 <script src="extras.js"></script>
+<script src="sync.js"></script>
 </body>
 </html>

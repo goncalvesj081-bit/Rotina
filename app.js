@@ -4,7 +4,7 @@
 const KEY = 'rotina_tarefas_v1';
 let tasks = [];
 try { tasks = JSON.parse(localStorage.getItem(KEY)) || []; } catch { tasks = []; }
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(tasks)); } catch {} };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(tasks)); } catch {} if (window.afterSave) window.afterSave(); };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 /* ================= estado da UI ================= */
