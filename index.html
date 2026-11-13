@@ -51,9 +51,25 @@
 </div>
 <div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo">Desfazer</button></div>
 
+<script>
+/* proteção: antes de tudo, tira itens quebrados; se o arquivo inteiro estiver ilegível, guarda à parte em vez de perder */
+(function () {
+  var K = 'rotina_tarefas_v1';
+  try {
+    var raw = localStorage.getItem(K);
+    if (raw == null) return;
+    var v;
+    try { v = JSON.parse(raw); } catch (e) { localStorage.setItem('rotina_tarefas_corrompido', raw); localStorage.removeItem(K); return; }
+    if (!Array.isArray(v)) { localStorage.setItem('rotina_tarefas_corrompido', raw); localStorage.removeItem(K); return; }
+    var c = v.filter(function (t) { return t && typeof t === 'object' && typeof t.title === 'string' && t.title.trim(); });
+    if (c.length !== v.length) localStorage.setItem(K, JSON.stringify(c));
+  } catch (e) {}
+})();
+</script>
 <script src="parser.js"></script>
 <script src="app.js"></script>
 <script src="extras.js"></script>
 <script src="sync.js"></script>
+<script src="robust.js"></script>
 </body>
 </html>

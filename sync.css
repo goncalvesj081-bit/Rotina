@@ -19,3 +19,16 @@
 .sheet .msg{font-size:13px;color:var(--red);min-height:18px;margin-top:6px}
 .sync-chip,.today{white-space:nowrap}
 header{flex-wrap:wrap;row-gap:6px}
+.sheet .qr{display:flex;justify-content:center;margin:0 auto 12px;width:220px;max-width:70%;aspect-ratio:1;background:#fff;border-radius:12px;padding:6px;color:#666;font-size:13px;align-items:center;text-align:center}
+.sheet .qr svg{width:100%;height:100%;display:block}
+.sheet .code{font-size:18px}
+/* busca e cópias */
+.search{margin:14px 0 4px}
+.search input{width:100%;font:inherit;font-size:15px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);outline:0}
+.search input:focus{border-color:var(--acc)}
+.copies{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto}
+.copy-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:10px;padding:10px 12px}
+.copy-row b{display:block;font-size:14px}
+.copy-row span{font-size:12.5px;color:var(--tx2)}
+.copy-row button{padding:6px 12px;border-radius:8px;background:var(--acc);color:#fff;font-weight:600;font-size:13px}
+.copy-row button:disabled{background:var(--line);color:var(--tx3);cursor:default}

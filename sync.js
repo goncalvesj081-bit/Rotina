@@ -167,7 +167,8 @@ function openSheet() {
   if (sync.code) {
     bg.innerHTML = `<div class="sheet">
       <h2>☁ Sincronização ligada</h2>
-      <p>Para ver as mesmas tarefas em outro aparelho, abra o link abaixo nele (ou digite o código).</p>
+      <p>No outro aparelho, aponte a câmera para o QR code — ou abra o link, ou digite o código.</p>
+      <div class="qr" id="qrBox" aria-label="QR code para conectar outro aparelho"></div>
       <div class="code">${esc(sync.code)}</div>
       <div class="row">
         <button class="pri" data-s="copy">Copiar link</button>
@@ -193,6 +194,38 @@ function openSheet() {
     </div>`;
   }
   document.body.appendChild(bg);
+  if (sync.code) drawQR();
+}
+
+// QR code com o link de conexão (biblioteca carregada só quando precisa)
+let qrLib = null;
+function loadQRLib() {
+  if (window.qrcode) return Promise.resolve();
+  if (qrLib) return qrLib;
+  const urls = ['https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js', 'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js'];
+  const tryLoad = i => new Promise((ok, fail) => {
+    if (i >= urls.length) return fail();
+    const sc = document.createElement('script');
+    sc.src = urls[i];
+    sc.onload = ok;
+    sc.onerror = () => { sc.remove(); tryLoad(i + 1).then(ok, fail); };
+    document.head.appendChild(sc);
+  });
+  qrLib = tryLoad(0).catch(e => { qrLib = null; throw e; });
+  return qrLib;
+}
+async function drawQR() {
+  const box = $('qrBox');
+  if (!box) return;
+  try {
+    await loadQRLib();
+    const q = qrcode(0, 'M');
+    q.addData(linkFor(sync.code));
+    q.make();
+    box.innerHTML = q.createSvgTag({ cellSize: 5, margin: 3, scalable: true });
+  } catch {
+    box.innerHTML = '<span>Sem internet para gerar o QR. Use o link ou o código.</span>';
+  }
 }
 function closeSheet() { $('sheet')?.remove(); }
 const sheetMsg = m => { const el = $('sheetMsg'); if (el) el.textContent = m; };
