@@ -1,0 +1,29 @@
+/* etapas (subtarefas) */
+.subs{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.sub{display:flex;align-items:center;gap:8px;font-size:14px}
+.sub span{flex:1;min-width:0;word-wrap:break-word}
+.sub.done span{text-decoration:line-through;color:var(--tx3)}
+.sub-check{flex:none;width:16px;height:16px;border-radius:4px;border:2px solid var(--tx3);display:grid;place-items:center}
+.sub.done .sub-check{background:var(--grn);border-color:var(--grn)}
+.sub.done .sub-check::after{content:"";width:4px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.sub-del{flex:none;color:var(--tx3);font-size:16px;line-height:1;padding:0 4px;opacity:.6}
+.sub-del:hover{opacity:1;color:var(--red)}
+.sub-add{align-self:flex-start;font-size:13px;color:var(--acc);padding:2px 0}
+.sub-in{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--acc);border-radius:6px;background:var(--soft);color:var(--tx);outline:0;width:100%}
+.tag.sub-ok{background:var(--grn-soft);color:var(--grn)}
+
+/* modo foco */
+.foco-ov{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:24px;background:#1f2a44;color:#fff}
+.foco-ov.pausa{background:#1e3a2f}
+.foco-box{text-align:center;max-width:460px;width:100%}
+.foco-kind{font-size:15px;opacity:.8;letter-spacing:.04em}
+.foco-title{font-size:22px;font-weight:700;margin:10px 0 18px;word-wrap:break-word}
+.foco-time{font-size:min(26vw,120px);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.foco-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.foco-btns button{padding:11px 18px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-weight:600;font-size:15px}
+.foco-btns button.pri{background:#fff;color:#1f2a44}
+.foco-hint{margin-top:22px;font-size:14px;opacity:.7}
+
+/* aviso de nova versão */
+.update-bar{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:40;background:var(--acc);color:#fff;padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.2);max-width:calc(100% - 32px)}
+.update-bar button{background:#fff;color:var(--acc);font-weight:700;padding:5px 12px;border-radius:8px}
