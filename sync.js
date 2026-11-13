@@ -2,76 +2,89 @@
 /* ================= sincronização entre aparelhos =================
    Cada aparelho guarda as tarefas localmente (funciona offline) e, se tiver um
    código de sincronização, troca com o Supabase. Quem tem o código vê as tarefas.
-   Conflitos: vale a alteração mais recente de cada tarefa. Excluídas viram "lápide"
-   por 60 dias para a exclusão chegar nos outros aparelhos. */
+   Cada tarefa é uma linha no banco; o aparelho envia só o que mudou e recebe só o
+   que mudou desde a última vez. Conflitos: vale a alteração mais recente de cada
+   tarefa (decidido no banco). Excluídas viram "lápide" para a exclusão se espalhar. */
 const SB_URL = 'https://kxcczvsavdnpzvfmmcdq.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4Y2N6dnNhdmRucHp2Zm1tY2RxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwMjkwOTYsImV4cCI6MjA5ODYwNTA5Nn0.EQOBtgLDeEtv_9dpvvpzQEk7JsLqE_kCqRQeUfvGQEs';
 const CODE_KEY = 'rotina_sync_code';
 const TOMB_KEY = 'rotina_sync_tombs';
+const DIRTY_KEY = 'rotina_sync_dirty';
+const SINCE_KEY = 'rotina_sync_since';
 const TOMB_TTL = 60 * 864e5;
 
 const sync = {
   code: null, busy: false, again: false, timer: null, state: 'off', lastOk: 0,
-  tombs: [], known: new Map(),
+  tombs: [], known: new Map(), dirty: new Set(), since: null,
 };
+const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
+const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 try { sync.code = localStorage.getItem(CODE_KEY); } catch {}
-try { sync.tombs = JSON.parse(localStorage.getItem(TOMB_KEY)) || []; } catch {}
+sync.tombs = load(TOMB_KEY, []);
+sync.dirty = new Set(load(DIRTY_KEY, []));
+sync.since = load(SINCE_KEY, null);
 
 const stripUpd = t => { const { upd, ...rest } = t; return JSON.stringify(rest); };
 const rememberAll = () => { sync.known = new Map(tasks.map(t => [t.id, stripUpd(t)])); };
-const saveTombs = () => { try { localStorage.setItem(TOMB_KEY, JSON.stringify(sync.tombs)); } catch {} };
+const saveMeta = () => { store(TOMB_KEY, sync.tombs); store(DIRTY_KEY, [...sync.dirty]); store(SINCE_KEY, sync.since); };
 const saveLocalOnly = () => { try { localStorage.setItem(KEY, JSON.stringify(tasks)); } catch {} };
 
-// marca o que mudou desde o último salvamento (para saber qual versão é a mais nova)
+// marca o que mudou desde o último salvamento: ganha carimbo novo e entra na fila de envio
 function stamp() {
   const now = Date.now();
   const ids = new Set();
   for (const t of tasks) {
     ids.add(t.id);
     const prev = sync.known.get(t.id);
-    if (prev === undefined || prev !== stripUpd(t)) t.upd = now;
+    if (prev === undefined || prev !== stripUpd(t)) { t.upd = now; sync.dirty.add(t.id); }
     sync.tombs = sync.tombs.filter(x => x.id !== t.id || x.upd > (t.upd || 0));
   }
   for (const id of sync.known.keys()) {
-    if (!ids.has(id)) sync.tombs.push({ id, del: true, upd: now });
+    if (!ids.has(id)) { sync.tombs.push({ id, del: true, upd: now }); sync.dirty.add(id); }
   }
   rememberAll();
   saveLocalOnly();
-  saveTombs();
+  saveMeta();
 }
 
 window.afterSave = () => {
   stamp();
-  if (sync.code) { clearTimeout(sync.timer); sync.timer = setTimeout(runSync, 1200); }
+  if (sync.code) { clearTimeout(sync.timer); sync.timer = setTimeout(runSync, 800); }
 };
 
-function merge(remote) {
+// junta o que veio do servidor: em cada tarefa vale a versão mais recente
+function applyRemote(items) {
   const all = new Map();
   const put = x => { if (!x || !x.id) return; const cur = all.get(x.id); if (!cur || (x.upd || 0) > (cur.upd || 0)) all.set(x.id, x); };
-  (Array.isArray(remote) ? remote : []).forEach(put);
   tasks.forEach(put);
   sync.tombs.forEach(put);
+  (items || []).forEach(put);
   const cutoff = Date.now() - TOMB_TTL;
   const merged = [...all.values()];
-  return {
-    tasks: merged.filter(x => !x.del),
-    tombs: merged.filter(x => x.del && x.upd > cutoff),
-  };
+  tasks = merged.filter(x => !x.del);
+  sync.tombs = merged.filter(x => x.del && x.upd > cutoff);
 }
 
 async function rpc(fn, body) {
-  const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
-    method: 'POST',
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) {
-    let msg = r.status + '';
-    try { const j = await r.json(); msg = j.code === 'PGRST202' || r.status === 404 ? 'semBanco' : (j.message || msg); } catch {}
-    throw new Error(msg);
-  }
-  const txt = await r.text();
-  return txt ? JSON.parse(txt) : null;
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
+      method: 'POST', signal: ctrl.signal,
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      let msg = r.status + '';
+      try { const j = await r.json(); msg = j.code === 'PGRST202' || r.status === 404 ? 'semBanco' : (j.message || msg); } catch {}
+      throw new Error(msg);
+    }
+    const txt = await r.text();
+    return txt ? JSON.parse(txt) : null;
+  } catch (e) {
+    if (e.name === 'AbortError') throw new TypeError('timeout');
+    throw e;
+  } finally { clearTimeout(to); }
 }
 
 function setState(s, detail) {
@@ -81,7 +94,7 @@ function setState(s, detail) {
   chip.hidden = false;
   chip.className = 'sync-chip' + (s === 'ok' ? ' ok' : s === 'err' ? ' err' : '');
   chip.textContent = s === 'ok' ? '☁ sincronizado' : s === 'busy' ? '☁ sincronizando…' : s === 'offline' ? '☁ sem internet' : '☁ erro';
-  chip.title = detail || '';
+  chip.title = detail || (s === 'ok' ? 'Última sincronização: ' + new Date(sync.lastOk).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '');
 }
 
 async function runSync() {
@@ -90,20 +103,29 @@ async function runSync() {
   sync.busy = true;
   setState('busy');
   try {
-    const remote = await rpc('rotina_get', { p_code: sync.code });
+    // 1) envia o que mudou aqui (em lotes)
+    if (sync.dirty.size) {
+      const byId = new Map([...tasks, ...sync.tombs].map(x => [x.id, x]));
+      const ids = [...sync.dirty];
+      for (let i = 0; i < ids.length; i += 500) {
+        const lote = ids.slice(i, i + 500).map(id => byId.get(id)).filter(Boolean);
+        if (lote.length) await rpc('rotina_push', { p_code: sync.code, p_items: lote });
+        ids.slice(i, i + 500).forEach(id => sync.dirty.delete(id));
+        saveMeta();
+      }
+    }
+    // 2) recebe o que mudou nos outros aparelhos
+    const res = await rpc('rotina_pull', { p_code: sync.code, p_since: sync.since });
     const before = JSON.stringify(tasks);
-    const m = merge(remote);
-    tasks = m.tasks;
-    sync.tombs = m.tombs;
-    rememberAll(); saveLocalOnly(); saveTombs();
+    applyRemote(res.items);
+    sync.since = res.now;
+    rememberAll(); saveLocalOnly(); saveMeta();
     if (JSON.stringify(tasks) !== before) render();
-    const out = [...tasks, ...sync.tombs];
-    if (JSON.stringify(out) !== JSON.stringify(remote)) await rpc('rotina_put', { p_code: sync.code, p_data: out });
     sync.lastOk = Date.now();
     setState('ok');
   } catch (e) {
     if (!navigator.onLine || e instanceof TypeError) setState('offline', 'Vai sincronizar quando voltar a internet');
-    else if (e.message === 'semBanco') setState('err', 'O banco ainda não foi configurado (rodar supabase.sql)');
+    else if (e.message === 'semBanco') setState('err', 'Banco de sincronização indisponível');
     else setState('err', e.message);
   } finally {
     sync.busy = false;
@@ -123,6 +145,9 @@ const linkFor = code => `${location.origin}${location.pathname}?sync=${code}`;
 
 function connect(code) {
   sync.code = code;
+  sync.since = null;
+  sync.dirty = new Set([...tasks, ...sync.tombs].map(x => x.id));
+  saveMeta();
   try { localStorage.setItem(CODE_KEY, code); } catch {}
   setState('busy');
   return runSync();
