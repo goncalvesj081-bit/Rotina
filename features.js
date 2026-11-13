@@ -128,7 +128,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('focusout', e => {
   if (e.target.matches && e.target.matches('[data-subadd]') && !e.target.value.trim()) {
-    setTimeout(() => { if (addingSubFor && !document.querySelector('[data-subadd]:foco')) { addingSubFor = null; render(); } }, 150);
+    setTimeout(() => { if (addingSubFor && !document.querySelector('[data-subadd]:focus')) { addingSubFor = null; render(); } }, 150);
   }
 });
 
